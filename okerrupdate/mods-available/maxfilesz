@@ -89,8 +89,8 @@ RECURSIVE=1
 MAXLIM=100M
 
 # regex to skip these files (empty: do not skip anything)
-# SKIP=/var/log/journal
-SKIP=
+# default: skip files ending with dot-number and .gz
+SKIP=\.\d$|\.gz$
 
 """.strip()
 
