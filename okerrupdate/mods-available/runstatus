@@ -77,6 +77,9 @@ apache_RUN="systemctl is-active --quiet apache2"
 # after command: touch /tmp/empty
 # empty_RUN="test ! -s /tmp/empty"
 
+# if URL is available
+# google_RUN = curl --silent --head --fail --output /dev/null http://google.com/
+
 ### COMMON SETTINGS
 
 # PREFIX2=run:
