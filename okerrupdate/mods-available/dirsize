@@ -1,0 +1,96 @@
+#!/usr/bin/python3
+
+import os
+import re
+import sys
+import glob
+
+def kmgt(sz, frac=1):
+    t = {
+        'K': pow(1024, 1),
+        'M': pow(1024, 2),
+        'G': pow(1024, 3),
+        'T': pow(1024, 4),
+        '': 1}
+
+    for k in sorted(t, key=t.__getitem__, reverse=True):
+        if sz >= t[k]:
+            n = sz / float(t[k])
+            tpl = "{:." + str(frac) + "f}{}"
+            return tpl.format(n, k)
+
+def du(path):
+    total = 0
+
+    if os.path.isfile(path):
+        return os.stat(path).st_size
+
+    for root, dirs, files in os.walk(path, topdown=False):
+        for f in files:
+            filepath = os.path.join(root, f)
+            try:
+                if os.path.isfile(filepath) and not os.path.islink(filepath):
+                    total += os.path.getsize(filepath)
+            except OSError as e:
+                pass
+    return total
+
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Directory sizes',
+        'Version': '0.1',
+        'Methods': 'check makeconfig info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+    basename = os.getenv('BASENAME')
+
+    pathlist = os.getenv('PATHLIST','/root /home/*')
+    maxlim = os.getenv('MAXLIM','1G')
+    skip = os.getenv('SKIP','')
+
+    for path in pathlist.split(' '):
+        for curpath in glob.glob(path):
+            if skip and re.search(skip, curpath):
+                continue
+
+            sz = du(curpath)
+
+            print("NAME: {}{}-{}".format(prefix, basename, curpath))
+            print("TAGS: dirsize")
+            print("METHOD: numerical|maxlim={}".format(maxlim))
+            print("DETAILS: {}".format(kmgt(sz)))
+            print("STATUS: {}".format(sz))
+            print()
+
+elif method=='makeconfig':
+    data="""
+#
+# Env configurational file for 'maxfilesz' check
+#
+
+# Space-separated directories to check (glob)
+# PATHLIST=/var/log /tmp
+PATHLIST=/home/* /root
+
+# value which triggers alert
+MAXLIM=1G
+
+# regex to skip these files (empty: do not skip anything)
+# SKIP=/home/user1|/home/user2
+SKIP=
+
+""".strip()
+
+    print(data)

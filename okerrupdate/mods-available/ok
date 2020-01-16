@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+
+import sys, os
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'OK trivial check',
+        'Version': '0.1',
+        'Methods': 'check info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    prefix = os.getenv('PREFIX')
+    print("NAME: {}ok".format(prefix))
+    print("STATUS: OK")

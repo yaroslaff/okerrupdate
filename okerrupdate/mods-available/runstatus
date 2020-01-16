@@ -1,0 +1,89 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import shlex
+import subprocess
+
+VARSUFFIX='_RUN'
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Run program and report exit code',
+        'Version': '0.1',
+        'Methods': 'check makeconfig info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+
+    for k, v in os.environ.items():
+        if not k.endswith(VARSUFFIX):
+            continue
+        name = k[:-len(VARSUFFIX)]
+        details = ''
+
+        try:
+            r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except Exception as e:
+            code = -1
+            details = str(e)
+        else:
+            code = r.returncode
+            if r.stderr:
+                details = r.stderr.decode().strip().split('\n')[0]
+            else:
+                details = r.stdout.decode().strip().split('\n')[0]
+
+        print("NAME: {}{}".format(prefix, name))
+        print("TAGS: run")
+        print("DETAILS: {}".format(details))
+        print("METHOD: numerical|maxlim=0|minlim=0")
+        print("STATUS: {}".format(code))
+        print()
+
+elif method=='makeconfig':
+    data="""
+#
+# Env configurational file for 'runstatus' check
+#
+
+#
+# This will make indicator prefix:true with status 0 (always OK unless failed) 
+#
+# true_RUN=/bin/true
+
+#
+# This will make indicator prefix:false with status 1 (always ERR) 
+#
+# false_RUN=/bin/false
+
+#
+# This will make indicator prefix:myapache which will be OK if apache2 is running
+#
+apache_RUN="systemctl is-active --quiet apache2"
+
+# nonempty_RUN="test -s /etc/passwd"
+
+# after command: touch /tmp/empty
+# empty_RUN="test ! -s /tmp/empty"
+
+### COMMON SETTINGS
+
+# PREFIX2=run:
+
+# Policy if not default
+POLICY=
+
+""".strip()
+
+    print(data)

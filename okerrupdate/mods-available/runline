@@ -1,0 +1,92 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import shlex
+import subprocess
+import re
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Run program and report line of output',
+        'Version': '0.1',
+        'Methods': 'check makeconfig info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+
+    VARSUFFIX = '_RUN'
+
+    for k, v in os.environ.items():
+        if not k.endswith(VARSUFFIX):
+            continue
+
+        name = k[:-len(VARSUFFIX)]
+        lineno = int(os.getenv('{}_LINE'.format(name), '0'))
+        grep = os.getenv('{}_GREP'.format(name), '')
+        case = int(os.getenv('{}_CASE'.format(name), '1'))
+
+        if case == 0:
+            grep_opts = re.IGNORECASE
+        else:
+            grep_opts = 0
+
+        line = ''
+        try:
+            r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except Exception as e:
+            line = str(e)
+        else:
+            lines = r.stdout.decode().strip().split('\n')
+
+            if grep:
+                lines = list(filter(lambda s: re.search(grep, s, grep_opts), lines))
+            try:
+                line = lines[lineno]
+            except IndexError:
+                line = ''
+
+        print("NAME: {}{}".format(prefix, name))
+        print("TAGS: run")
+        print("DETAILS: {}".format(line))
+        print("METHOD: string|options=reinit dynamic")
+        print("STATUS: {}".format(line))
+        print()
+
+elif method=='makeconfig':
+    data="""
+#
+# Env configurational file for 'runstatus' check
+#
+
+#
+# This will make string indicator prefix:myapache 
+#
+apache_RUN="systemctl status apache2"
+# process only lines which matches this regex
+apache_GREP=error
+# case sensitive for grep
+apache_CASE=1
+# return this line (line 0 by default)
+apache_LINE=0
+
+### COMMON SETTINGS
+
+# PREFIX2=run:
+
+# Policy if not default
+POLICY=
+
+""".strip()
+
+    print(data)

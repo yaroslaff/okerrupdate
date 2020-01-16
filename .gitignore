@@ -1,0 +1,6 @@
+*~
+*pyc
+okerrupdate.egg-info/
+dist/
+build/
+.idea

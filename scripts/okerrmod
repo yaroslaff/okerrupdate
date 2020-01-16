@@ -1,0 +1,357 @@
+#!/usr/bin/python
+import okerrupdate
+import argparse
+import socket
+import subprocess
+import os
+import shutil
+import sys
+import logging
+from dotenv import load_dotenv
+
+def_mods_enabled = '/etc/okerr/mods-enabled'
+def_mods_available = [
+    '/etc/okerr/mods-available/',
+    os.path.join(os.path.dirname(okerrupdate.__file__), 'mods-available')
+    ]
+
+def_env = '/etc/okerr/mods-env/'
+
+def decode_escaped(s):
+    return s
+
+def parse_dotenv(dotenv_path):
+    with open(dotenv_path) as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith('#') or '=' not in line:
+                continue
+            k, v = line.split('=', 1)
+
+            # Remove any leading and trailing spaces in key, value
+            k, v = k.strip(), v.strip().encode('unicode-escape').decode('ascii')
+            if len(v) > 0:
+                quoted = v[0] == v[len(v) - 1] in ['"', "'"]
+
+                if quoted:
+                    v = decode_escaped(v[1:-1])
+
+            yield k, v
+
+class StrAttr:
+    def __init__(self, s = None):
+        self._keys = list()
+        if s:
+            self.loads(s)
+
+    def loads(self, s):
+        if isinstance(s, bytes):
+            s = s.decode('utf-8')
+
+        for line in str(s).split('\n'):
+            if not line:
+                continue
+            k,v = line.split(':', 1)
+            v = v.strip()
+            self.set(k,v)
+
+    def set(self, k, v):
+        setattr(self, k, v)
+        self._keys.append(k)
+
+    def __repr__(self):
+        s=""
+        for k in self._keys:
+            s +='{}={} '.format(k, getattr(self, k))
+        return s
+
+class UpdateStrAttr(StrAttr):
+    def __init__(self, s = None, name='noname'):
+        self.METHOD = 'heartbeat'
+        self.NAME = name
+        self.STATUS = 'OK'
+        self.DETAILS = ''
+        self.POLICY='Default'
+        self.TAGS=''
+        super().__init__(s)
+
+class InfoStrAttr(StrAttr):
+    def __init__(self, s = None):
+        self.Methods = 'check info'
+        super().__init__(s)
+
+class Module:
+    def __init__(self, name):
+
+        self.path_enabled = def_mods_enabled
+        self.path_available = def_mods_available
+        self.path_env = def_env
+
+        if os.path.isfile(name):
+            path = name
+        else:
+            path = self.find_module(name)
+
+        out_info = subprocess.run([path, 'info'], stdout = subprocess.PIPE)
+        self.info = InfoStrAttr(out_info.stdout)
+        self._name = os.path.basename(name)
+        self._path = os.path.realpath(path)
+
+    @staticmethod
+    def find_module(name):
+        # not direct path, guess it
+        for path in listdirs([ def_mods_enabled, def_mods_available] ):
+            if os.path.basename(path) == name:
+                return path
+
+    def load_env(self):
+        env = dict()
+        envfile = os.path.join(self.path_env, self._name)
+        if not os.path.isfile(envfile):
+            log.debug('no envfile {}, using empty env'.format(envfile))
+            return env
+
+        log.debug("load env for {} from {}".format(self._name, envfile))
+        env = dict(parse_dotenv(envfile))
+        return env
+
+    def check(self, prefix, project, secret=None, dump=False):
+
+        env = self.load_env()
+        env['PREFIX'] = prefix + env.get('PREFIX2','')
+        env['BASENAME'] = self._name
+
+        log.debug('... Run check {}'.format(self._path))
+        out_info = subprocess.run([self._path, 'check'], stdout=subprocess.PIPE, env=env)
+
+        if args.dump:
+            print(out_info.stdout.decode('utf8'))
+            return
+
+        for update in out_info.stdout.decode('utf8').split('\n\n'):
+            if not update:
+                # skip empty
+                continue
+            u = UpdateStrAttr()
+            u.set('POLICY', env.get('POLICY'))
+            try:
+                u.loads(update)
+            except ValueError:
+                log.error("Failed to parse {!r} from {}".format(update, self._path))
+
+            log.debug(u)
+            i = project.indicator(u.NAME, secret=secret,
+                                  method=u.METHOD, policy=u.POLICY, tags=u.TAGS.split(' '))
+            i.update(u.STATUS, details=u.DETAILS)
+
+    def enabled(self):
+        for basename in os.listdir(self.path_enabled):
+            path = os.path.join(self.path_enabled, basename)
+            if os.path.realpath(path) == self._path:
+                return True
+
+        return False
+
+    def has_method(self, method):
+        return method in self.info.Methods.split(' ')
+
+    def enable(self):
+        log.info("enable {}".format(self._path))
+        envfile = os.path.join(self.path_env, self._name)
+
+        if self.has_method('preenable'):
+            s = subprocess.run([self._path, 'preenable'], stdout=subprocess.PIPE)
+            if s.returncode:
+                log.error(s.stdout.decode().strip())
+                log.error("Pre-enable check failed.")
+                return
+
+        if self.has_method('makeconfig') and not os.path.exists(envfile):
+            log.debug("make env config file {}".format(envfile))
+            out_makeconfig = subprocess.run([self._path, 'makeconfig'], stdout=subprocess.PIPE)
+            with open(envfile, 'w') as f:
+                f.write(out_makeconfig.stdout.decode('utf-8'))
+
+        linkpath = os.path.join(self.path_enabled, self._name)
+
+        if os.path.exists(linkpath):
+            log.warning('Already exists {} -> {}'.format(linkpath, os.path.realpath(linkpath)))
+            return
+
+        os.symlink(self._path, linkpath)
+
+    def disable(self):
+        log.info("disable {}".format(self._path))
+        path = os.path.join(self.path_enabled, self._name)
+        if os.path.exists(path):
+            log.debug("disable {}".format(path))
+            os.unlink(path)
+        else:
+            log.info('not enabled {}'.format(self._path))
+
+    def __repr__(self):
+        if self.enabled():
+            sign = '+'
+        else:
+            sign = '-'
+        return "{} {} {} {}".format(sign, self._name, self.info.Version, self.info.Description)
+
+def run1(project, prefix, path, secret=None, dump=False):
+    m = Module(path)
+    log.debug("process {}".format(m))
+    m.check(prefix=prefix, project=project, secret=secret, dump=dump)
+
+def list2str(l):
+    for e in l:
+        if isinstance(e, str):
+            yield e
+        else:
+            for ee in list2str(e):
+                yield ee
+
+def listdirs(dirs):
+    for d in list2str(dirs):
+        for basename in os.listdir(d):
+            yield os.path.join(d, basename)
+
+
+# main code
+conf_file = '/etc/okerr/okerrupdate'
+load_dotenv(dotenv_path = conf_file)
+
+def_prefix = socket.gethostname().split('.')[0]+':'
+def_secret = os.getenv('OKERR_SECRET', None)
+def_textid = os.getenv('OKERR_TEXTID', None)
+
+def_mod_avail = os.getenv('OKERR_MOD_AVAIL', None)
+
+parser = argparse.ArgumentParser(description='Micro okerr update utility.')
+parser.add_argument('prefix', metavar='PREFIX', default=def_prefix, nargs='?',
+                    help='prefix for indicator. default: {}'.format(def_prefix))
+parser.add_argument('-i','--textid', metavar='TextID', default=def_textid, help='Project textid ({!r})'.format(def_textid))
+parser.add_argument('--url', metavar='URL', help='URL of server (usually not needed)', default=None)
+parser.add_argument('--direct', action='store_true', help='Do not use director feature, use direct --url', default=False)
+parser.add_argument('-S','--secret', metavar='SECRET', help='SECRET', default=def_secret)
+# Policy not actual here, because different mods may need different policies
+# parser.add_argument('-p','--policy', metavar='POLICY', help='use this policy by default ', default='Default')
+parser.add_argument('-v', dest='verbose', action='count', help='verbose', default=0)
+parser.add_argument('-q', dest='quiet', action='store_true', help='quiet', default=False)
+parser.add_argument('--log', metavar='PATH', help='log filename', default=None)
+parser.add_argument('--dry', default=False, action='store_true', help='Dry run, do not update any indicator')
+parser.add_argument('--dump', default=False, action='store_true', help='dump output from module, do not process it')
+
+g = parser.add_argument_group('Modules')
+g.add_argument('--run', metavar='PATH', help='Run one module or all modules in PATH ({})'.format(def_mods_enabled),
+               default=def_mods_enabled)
+g.add_argument('--enable', metavar='MOD', help='Enable module')
+g.add_argument('--disable', metavar='MOD', help='Disable module')
+g.add_argument('--list', default=False, action='store_true', help='List modules')
+g.add_argument('--init', default=False, action='store_true', help='Init /etc/okerr directory')
+g.add_argument('--avail', default=os.getenv('OKERR_MOD_AVAIL', None),
+               help='Additional path to other mods-available ({})'.format(os.getenv('OKERR_MOD_AVAIL')))
+
+args = parser.parse_args()
+
+if args.avail:
+    def_mods_available = [args.avail] + def_mods_available
+
+logging.basicConfig()
+log = logging.getLogger('okerrmod')
+log.propagate = False
+oulog = logging.getLogger('okerrupdate')
+
+# log.removeHandler(log.handlers[0])
+out = logging.StreamHandler(sys.stdout)
+out.setFormatter(logging.Formatter('%(asctime)s %(message)s',
+                                   datefmt='%Y/%m/%d %H:%M:%S'))
+out.setLevel(logging.DEBUG)
+log.addHandler(out)
+
+if args.verbose:
+    log.setLevel(logging.DEBUG)
+elif args.quiet:
+    log.setLevel(logging.WARNING)
+else:
+    log.setLevel(logging.INFO)
+
+if args.list:
+    listed = list()
+    for path in sorted(listdirs([def_mods_enabled, def_mods_available])):
+        m = Module(path)
+        if m._path in listed:
+            continue
+        print(m)
+        listed.append(m._path)
+    sys.exit()
+
+if args.enable:
+    m = Module(name = args.enable)
+    m.enable()
+    sys.exit()
+
+if args.disable:
+    m = Module(name = args.disable)
+    m.disable()
+    sys.exit()
+
+if args.init:
+    if not os.getuid() == 0:
+        log.error("You must be root to --init and make /etc/okerr")
+        exit(1)
+
+    dirs = ['/etc/okerr', '/etc/okerr/mods-available', '/etc/okerr/mods-enabled', '/etc/okerr/mods-env/']
+    mods = ['la', 'opentcp', 'df']
+
+    for dir in dirs:
+        if not os.path.isdir(dir):
+            log.info("Create {}".format(dir))
+            os.mkdir(dir)
+        else:
+            log.info('.. already exists {}'.format(dir))
+
+    if not os.path.isfile(conf_file):
+        with open(conf_file, 'w') as fh:
+            fh.write("""
+# Stub for okerrmod            
+OKERR_TEXTID=
+OKERR_SECRET=
+
+OKERR_MOD_AVAIL=
+""".lstrip())
+
+    for modname in mods:
+        log.info('enable default {}'.format(modname))
+        m = Module(name = modname)
+        m.enable()
+
+    src = os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod')
+    dst = '/etc/cron.d/okerrmod'
+    if not os.path.exists('/etc/cron.d/okerrmod'):
+        log.info('Copy {} to {}'.format(src, dst))
+        shutil.copy(src, dst)
+
+    exit()
+
+if args.log:
+    fh = logging.FileHandler(args.log)
+    fh.setLevel(logging.INFO)
+    fh.setFormatter(logging.Formatter('%(asctime)s %(message)s',
+                                       datefmt='%Y/%m/%d %H:%M:%S'))
+    log.addHandler(fh)
+    oulog.addHandler(fh)
+
+p = okerrupdate.OkerrProject(args.textid, url=args.url, direct=args.direct)
+if args.verbose>=2:
+    p.verbose()
+
+if os.path.isdir(args.run):
+    log.debug("Process all modules in {}".format(args.run))
+    for basename in os.listdir(args.run):
+        run1(project=p, prefix=args.prefix, path=os.path.join(args.run, basename), secret=args.secret, dump=args.dump)
+elif os.path.isfile(args.run):
+    log.debug("Process module {}".format(args.run))
+    run1(project = p, prefix=args.prefix, path = args.run, secret=args.secret, dump=args.dump)
+else:
+    m = Module(name = args.run)
+    log.debug('Run module {} from {}'.format(m._name, m._path))
+    m.check(prefix = args.prefix, project = p, secret=args.secret, dump=args.dump)

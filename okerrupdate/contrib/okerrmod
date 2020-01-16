@@ -1,0 +1,2 @@
+*/20 * * * *        root        /usr/local/bin/okerrmod --log /var/log/okerrmod.log
+

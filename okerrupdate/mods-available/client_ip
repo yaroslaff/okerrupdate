@@ -1,0 +1,67 @@
+#!/usr/bin/python3
+
+import sys, os, requests, time
+
+url = os.getenv('URL', 'https://diagnostic.opendns.com/myip')
+user_agent = os.getenv('USER_AGENT', 'curl/7.58.0')
+
+def myip():
+    headers = { 'User-Agent': user_agent}
+
+    while True:
+        try:
+            r = requests.get(url, headers=headers)
+        except requests.exceptions.RequestException:
+            time.sleep(1)
+            pass
+        if r.status_code == 200:
+            return r.text.strip()
+        else:
+            time.sleep(5)
+
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Report IP address ',
+        'Version': '0.1',
+        'Methods': 'check info makeconfig'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+
+    ip = myip()
+
+    prefix = os.getenv('PREFIX')
+    print("NAME: {}ip".format(prefix))
+    print("TAGS: ip")
+    print("METHOD: string|options=reinit dynamic")
+    print("DETAILS: {}".format(ip))
+    print("STATUS: {}".format(ip))
+
+
+
+elif method=='makeconfig':
+    data="""
+
+# default URL
+URL=https://diagnostic.opendns.com/myip
+
+# Alternate URLS
+# URL=https://ifconfig.me
+# URL=https://ifconfig.me
+
+USER_AGENT=curl/7.58.0
+
+# Policy if not default
+POLICY=
+""".strip()
+
+    print(data)

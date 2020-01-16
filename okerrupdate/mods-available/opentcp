@@ -1,0 +1,141 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import psutil
+import re
+import shutil
+from socket import AF_INET, AF_INET6, SOCK_STREAM, SOCK_DGRAM
+from pprint import pprint
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Network connections (listening sockets)',
+        'Version': '0.1',
+        'Methods': 'check info makeconfig'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+    status = os.getenv('STATUS', 'LISTEN')
+    laddr = os.getenv('LADDR', '127.0.0.1')
+    skip_exe = os.getenv('SKIP_EXE','')
+    skip_port = list(map(int, filter(None, os.getenv('SKIP_PORT','').split(' '))))
+    format = os.getenv('FORMAT','{port}')
+    dformat = os.getenv('DFORMAT', '{port}:{name}')
+
+    fails = 0
+
+    proto_map = {
+        (AF_INET, SOCK_STREAM): 'TCP',
+        (AF_INET6, SOCK_STREAM): 'TCP6',
+        (AF_INET, SOCK_DGRAM): 'UDP',
+        (AF_INET6, SOCK_DGRAM): 'UDP6',
+    }
+
+    outdata=list()
+    ports = list()
+
+    for p in psutil.process_iter():
+        try:
+            conns = p.connections()
+            if len(conns):
+
+                for c in conns:
+                    if not re.search(status, c.status):
+                        continue
+
+                    if not re.search(laddr, c.laddr[0]):
+                        continue
+
+                    if skip_exe and re.search(skip_exe, p.exe()):
+                        continue
+
+                    if c.laddr[1] in skip_port:
+                        continue
+
+                    if c.laddr[1] in ports:
+                        continue
+
+                    ports.append(c.laddr[1])
+
+                    cs = {}
+                    # cs['iname']=ts.iname
+                    cs['name'] = p.name()
+                    cs['pid'] = p.pid
+                    cs['basename'] = os.path.basename(p.exe())
+                    cs['exe'] = p.exe()
+                    cs['proto'] = proto_map[(c.family, c.type)]
+                    cs['ip'] = c.laddr[0]
+                    cs['port'] = c.laddr[1]
+                    cs['status'] = c.status
+
+                    outdata.append(cs)
+
+        except (psutil.Error, psutil.AccessDenied, psutil.NoSuchProcess):
+            fails += 1
+            pass
+
+    portstr = ' '.join(sorted(format.format(**cs) for cs in outdata))
+    d = ' '.join(sorted(dformat.format(**cs) for cs in outdata))
+    print("NAME: {}opentcp".format(prefix))
+    print("TAGS: opentcp")
+    print("METHOD: string|options=reinit dynamic")
+    print("DETAILS: {} ({} fails)".format(d, fails))
+
+    print("STATUS: {}".format(portstr))
+
+
+
+elif method=='makeconfig':
+    data="""
+# Only connections with this status (regex)
+STATUS=LISTEN
+
+# Only connections with this local address (regex)
+
+# only IPv4 world-listening
+LADDR=0.0.0.0 
+
+# IPv4+IPv6
+# LADDR=0.0.0.0|:: 
+
+
+# Skip these ports
+# SKIP_PORT=80 22
+SKIP_PORT=
+
+
+# Skip if exe matches this (regex)
+# SKIP_EXE=.*/sshd # do not list sshd
+SKIP_EXE=
+
+
+#
+# FORMAT
+# format may include fields:
+# name pid basename exe proto ip port status
+
+
+# format for each listening process in status
+FORMAT={port}
+
+# format for each listening process in details
+DFORMAT={port}:{name}
+
+### COMMON SETTINGS
+
+# Policy if not default
+POLICY=
+""".strip()
+
+    print(data)

@@ -1,0 +1,122 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Mariadb/MySQL numeric SQL query',
+        'Version': '0.1',
+        'Methods': 'check makeconfig preenable info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'preenable':
+    try:
+        import MySQLdb
+    except ModuleNotFoundError as e:
+        print("{}. To install module: sudo pip3 install mysqlclient".format(e))
+        sys.exit(1)
+    else:
+        sys.exit()
+
+elif method == 'check':
+
+    # read parameters
+    prefix = os.getenv('PREFIX')
+    basename = os.getenv('BASENAME')
+
+    dbhost = os.getenv('DBHOST', 'localhost')
+    dbuser = os.getenv('DBUSER', '')
+    dbpass = os.getenv('DBPASS', '')
+    dbname = os.getenv('DBNAME', '')
+
+
+    try:
+
+        import MySQLdb
+
+        db = MySQLdb.connect(
+            host=dbhost,
+            user=dbuser,
+            passwd=dbpass,
+            database=dbname)
+
+    except Exception as e:
+        print("NAME: {}{}".format(prefix, basename))
+        print("TAGS: {}".format(basename))
+        print("METHOD: numerical")
+        print("DETAILS: {}".format(str(e)))
+        print("STATUS: {}".format(-1))
+        sys.exit()
+
+    VARSUFFIX = '_SQL'
+
+    for k, v in os.environ.items():
+        if not k.endswith(VARSUFFIX):
+            continue
+
+        try:
+            name = k[:-len(VARSUFFIX)]
+
+            query = v
+            cur = db.cursor()
+            cur.execute(query)
+            value = cur.fetchone()[0]
+            details = "{}: {}".format(query, value)
+
+            print("NAME: {}{}".format(prefix, name))
+            print("TAGS: {}".format(basename))
+            print("METHOD: numerical")
+            print("DETAILS: {}".format(details))
+            print("STATUS: {}".format(value))
+            print()
+
+        except Exception as e:
+            print("NAME: {}{}".format(prefix, basename))
+            print("TAGS: {}".format(basename))
+            print("METHOD: numerical")
+            print("DETAILS: {}".format(str(e)))
+            print("STATUS: {}".format(-1))
+            print()
+
+
+elif method=='makeconfig':
+    data="""
+#
+# Env configurational file for 'mariadb' check
+#
+
+# Database access
+
+DBHOST=localhost
+DBUSER=root
+DBPASS=
+DBNAME=mysql
+
+# Simplest query, just return 2 if database working
+sum_SQL="SELECT 1+1"
+
+# Count number of user records
+users_SQL="SELECT COUNT(1) FROM user"
+
+### COMMON SETTINGS
+
+# PREFIX2=sql:
+
+# Policy if not default
+POLICY=
+
+
+""".strip()
+
+    print(data)

@@ -1,0 +1,45 @@
+#!/usr/bin/python3
+
+import os
+import sys
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Load average (3 indicators for 1, 5 and 15 minutes)',
+        'Version': '0.1',
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+    maxlim = int(os.getenv('MAXLIM','2'))
+
+    load1, load5, load15 = os.getloadavg()
+
+    data = """
+NAME: {prefix}la1
+TAGS: la
+METHOD: numerical|maxlim={maxlim}
+STATUS: {load1}
+
+NAME: {prefix}la5
+TAGS: la
+METHOD: numerical|maxlim={maxlim}
+STATUS: {load5}
+
+NAME: {prefix}la15
+TAGS: la
+METHOD: numerical|maxlim={maxlim}
+STATUS: {load15}
+
+""".format(prefix=prefix, load1=load1, load5=load5, load15=load15, maxlim=maxlim).strip()
+
+    print(data)

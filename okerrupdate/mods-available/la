@@ -1,0 +1,60 @@
+#!/usr/bin/python3
+
+import os
+import sys
+
+if len(sys.argv) == 1:
+    method = 'info'
+else:
+    method = sys.argv[1]
+
+if method == 'info':
+    info = {
+        'Protocol': '0.1',
+        'Description': 'Load average',
+        'Version': '0.1',
+        'Methods': 'check makeconfig info'
+    }
+    for k, v in info.items():
+        print("{}: {}".format(k, v))
+
+elif method == 'check':
+    # read parameters
+    prefix = os.getenv('PREFIX')
+    period = int(os.getenv('PERIOD','15'))
+    maxlim = int(os.getenv('MAXLIM','2'))
+
+    if period not in [1, 5, 15]:
+        period=15
+
+    load1, load5, load15 = os.getloadavg()
+
+    if period == 1:
+        la = load1
+    elif period == 5:
+        la = load5
+    else:
+        la = load15
+
+    print("NAME: {}la".format(prefix))
+    print("TAGS: la")
+    print("METHOD: numerical|maxlim={}".format(maxlim))
+    print("STATUS: {}".format(la))
+
+elif method=='makeconfig':
+    data="""
+#
+# Env configurational file for 'la' check
+#
+
+# value which triggers alert
+MAXLIM=2
+
+# Period is one of 1, 5, 15
+PERIOD=15
+
+# Policy if not default
+POLICY=
+""".strip()
+
+    print(data)
