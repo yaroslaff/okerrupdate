@@ -219,7 +219,7 @@ def listdirs(dirs):
 conf_file = '/etc/okerr/okerrupdate'
 load_dotenv(dotenv_path = conf_file)
 
-def_prefix = socket.gethostname().split('.')[0]+':'
+def_prefix = os.getenv('PREFIX', socket.gethostname().split('.')[0]+':')
 def_secret = os.getenv('OKERR_SECRET', None)
 def_textid = os.getenv('OKERR_TEXTID', None)
 
@@ -313,11 +313,12 @@ if args.init:
         with open(conf_file, 'w') as fh:
             fh.write("""
 # Stub for okerrmod            
+PREFIX={prefix}
 OKERR_TEXTID=
 OKERR_SECRET=
 
 OKERR_MOD_AVAIL=
-""".lstrip())
+""".lstrip().format(prefix=args.prefix))
 
     for modname in mods:
         log.info('enable default {}'.format(modname))
