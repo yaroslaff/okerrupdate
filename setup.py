@@ -7,8 +7,8 @@ def read(fname):
 
 setup(name='okerrupdate',
     version='1.1.38',
-    description='micro client for okerr cloud monitoring system',
-    url='http://okerr.com/',
+    description='client-side okerr module and utilities',
+    url='https://gitlab.com/yaroslaff/okerrupdate',
     author='Yaroslav Polyakov',
     author_email='xenon@sysattack.com',
     license='MIT',
