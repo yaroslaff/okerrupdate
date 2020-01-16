@@ -98,7 +98,7 @@ elif method=='makeconfig':
 # Env configurational file for 'notempty' check
 #
 
-# Space-separated directories to check (glob)
+# Space-separated files to check (glob)
 PATHLIST=/var/log/mail.log
 
 # recursive? if 1 and path ends with '**', it will match any file 

@@ -75,7 +75,6 @@ elif method == 'check':
                 n_ok += 1
                 continue
 
-
             nfiles += 1
             filename = curpath
             status = 'ERR'
@@ -101,7 +100,7 @@ elif method=='makeconfig':
 # Env configurational file for 'empty' check
 #
 
-# Space-separated directories to check (glob)
+# Space-separated files to check (glob)
 PATHLIST=/var/log/apache2/error.log /var/log/mysql.err
 
 # recursive? if 1 and path ends with '**', it will match any file 

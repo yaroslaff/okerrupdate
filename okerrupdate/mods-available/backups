@@ -38,7 +38,6 @@ def timesuffix2sec(timesuffix):
         suffix = 's'
     return n * suf[suffix]
 
-
 if len(sys.argv) == 1:
     method = 'info'
 else:
