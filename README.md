@@ -96,9 +96,6 @@ echo STATUS: OK
 Now you can run it manually `okerrmod --run my`, enable `okerrmod --enable my`, make/edit config file for it 
 `/etc/okerr/mods-env/my`.
 
-More info in [okerrupdate wiki](https://gitlab.com/yaroslaff/okerrupdate/-/wikis/home).
-
-
 ## Using okerrupdate python library
 Simplest case:
 ```python
@@ -109,3 +106,6 @@ op = okerrupdate.OkerrProject('MyTextID', secret='MySecret')
 i = op.indicator('temp', method='numerical|maxlim=37', policy='Daily')
 i.update('36.6')
 ```
+
+## WIKI
+More info in [okerrupdate wiki](https://gitlab.com/yaroslaff/okerrupdate/-/wikis/home).
