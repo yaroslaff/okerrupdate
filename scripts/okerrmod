@@ -187,7 +187,7 @@ class Module:
                 return
 
         if self.has_file('_config') and not os.path.exists(envfile):
-            log.debug("make env config file {}".format(envfile))
+            log.info("config file: {}".format(envfile))
             shutil.copy(self.mod_file('_config'), envfile)
 
         linkpath = os.path.join(self.path_enabled, self._name)
