@@ -186,9 +186,12 @@ class Module:
                 log.error("Pre-enable check failed.")
                 return
 
-        if self.has_file('_config') and not os.path.exists(envfile):
-            log.info("config file: {}".format(envfile))
-            shutil.copy(self.mod_file('_config'), envfile)
+        if self.has_file('_config'):
+            if not os.path.exists(envfile):
+                log.info("make default config file: {}".format(envfile))
+                shutil.copy(self.mod_file('_config'), envfile)
+            else:
+                log.info("already exists config file: {}".format(envfile))
 
         linkpath = os.path.join(self.path_enabled, self._name)
 
