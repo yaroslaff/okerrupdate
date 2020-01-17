@@ -71,13 +71,15 @@ okerr updated (200 OK) braconnier:ok@okerr = OK
 
 To enable new check:
 ```shell
-$ sudo okerrmod --enable sql
-2020/01/17 18:46:58 enable /home/xenon/repo/okerrupdate/okerrupdate/mods-available/sql
+$ sudo okerrmod --enable runstatus
+2020/01/17 16:12:30 enable /usr/local/lib/python3.7/dist-packages/okerrupdate/mods-available/runstatus
+2020/01/17 16:12:30 make default config file: /etc/okerr/mods-env/runstatus
+
 ```
 
 After this, you may want to edit default configuration for this check
 ```shell
-sudo vim /etc/okerr/mods-env/sql
+sudo vim /etc/okerr/mods-env/runstatus
 ```
 
 After this, `okerrmod` will run this check.
