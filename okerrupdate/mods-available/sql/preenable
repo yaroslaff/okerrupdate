@@ -1,9 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import sys
 
 try:
     import MySQLdb
-except ModuleNotFoundError as e:
+except ImportError as e:
     print("{}. To install module: sudo pip3 install mysqlclient".format(e))
     sys.exit(1)
 else:

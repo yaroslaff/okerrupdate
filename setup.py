@@ -6,11 +6,11 @@ def read(fname):
 
 
 setup(name='okerrupdate',
-    version='1.2.2',
+    version='1.2.5',
     description='client-side okerr module and utilities',
     url='https://gitlab.com/yaroslaff/okerrupdate',
     author='Yaroslav Polyakov',
-    author_email='xenon@sysattack.com',
+    author_email='yaroslaff@gmail.com',
     license='MIT',
     packages=['okerrupdate'],
     scripts=['scripts/okerrupdate','scripts/okerrmod'],

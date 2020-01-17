@@ -88,10 +88,13 @@ class Module:
         self.path_available = def_mods_available
         self.path_env = def_env
 
-        if os.path.isdir(name):
+        if name.startswith('/') and os.path.isdir(name):
             path = name
         else:
             path = self.find_module(name)
+
+        if path is None:
+            raise ValueError('No module {} found'.format(name))
 
         # out_info = subprocess.run([path, 'info'], stdout = subprocess.PIPE)
         info_path = os.path.join(path, '_info')
@@ -309,13 +312,21 @@ if args.list:
     sys.exit()
 
 if args.enable:
-    m = Module(name = args.enable)
-    m.enable()
+    try:
+        m = Module(name = args.enable)
+    except ValueError as e:
+        log.error(e)
+    else:
+        m.enable()
     sys.exit()
 
 if args.disable:
-    m = Module(name = args.disable)
-    m.disable()
+    try:
+        m = Module(name = args.disable)
+    except ValueError as e:
+        log.error(e)
+    else:
+        m.disable()
     sys.exit()
 
 if args.init:
