@@ -2,7 +2,7 @@
 
 ## Installation 
 
-~~~
+~~~shell script
 sudo pip3 install okerrupdate
 sudo okerrmod --init # enable few basic modules, create /etc/cron.d/ job, create basic config template
 sudo vim /etc/okerr/okerrupdate
