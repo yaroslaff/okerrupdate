@@ -4,10 +4,10 @@ STATUS=LISTEN
 # Only connections with this local address (regex)
 
 # only IPv4 world-listening
-LADDR=0.0.0.0 
+# LADDR=0.0.0.0
 
 # IPv4+IPv6
-# LADDR=0.0.0.0|:: 
+LADDR=0.0.0.0|::
 
 
 # Skip these ports

@@ -128,7 +128,7 @@ class Module:
         env['PREFIX'] = prefix + env.get('PREFIX2','')
         env['BASENAME'] = self._name
 
-        path_check = os.path.join(self._path, 'check')
+        path_check = self.mod_file('check')
 
         log.debug('... Run check {}'.format(path_check))
         out_info = subprocess.run([path_check], stdout=subprocess.PIPE, env=env)
@@ -166,23 +166,26 @@ class Module:
         path_method = os.path.join(self._path, method)
         return os.path.isfile(path_method)
 
+    def mod_file(self, file):
+        return os.path.join(self._path, file)
+
+    def has_file(self, file):
+        return os.path.isfile(self.mod_file(file))
+
     def enable(self):
         log.info("enable {}".format(self._path))
         envfile = os.path.join(self.path_env, self._name)
 
         if self.has_method('preenable'):
-
-            s = subprocess.run([os.path.join(self._path, 'preenable')], stdout=subprocess.PIPE)
+            s = subprocess.run([self.mod_file('preenable')], stdout=subprocess.PIPE)
             if s.returncode:
                 log.error(s.stdout.decode().strip())
                 log.error("Pre-enable check failed.")
                 return
 
-        if self.has_method('makeconfig') and not os.path.exists(envfile):
+        if self.has_file('_config') and not os.path.exists(envfile):
             log.debug("make env config file {}".format(envfile))
-            out_makeconfig = subprocess.run([self._path, 'makeconfig'], stdout=subprocess.PIPE)
-            with open(envfile, 'w') as f:
-                f.write(out_makeconfig.stdout.decode('utf-8'))
+            shutil.copy(self.mod_file('_config'), envfile)
 
         linkpath = os.path.join(self.path_enabled, self._name)
 
