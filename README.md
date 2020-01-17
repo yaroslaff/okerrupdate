@@ -4,7 +4,7 @@
 
 ```shell
 sudo pip3 install okerrupdate
-sudo okerrmod --init # enable few basic modules, create /etc/cron.d/ job, create basic config template
+sudo okerrmod --init # enable few basic modules, create /etc/cron.d/ job, create okerrupdate config template
 sudo vim /etc/okerr/okerrupdate
 ```
 
@@ -42,10 +42,10 @@ variables.
 
 
 ### okerrmod utility
-okerrmod is script to use different okerr checks. After initial `okerrmod --init`, few basic simple check modules 
+okerrmod is script to perform different local checks (such as free disk space, mysql running, load average, etc.). After initial `okerrmod --init`, few basic check modules 
 are enabled.
 
-List all available check modules:
+List all available check modules (`+` - module enabled, `-` - module disabled ):
 ```shell
 $ okerrmod --list
 + backups 0.1 Check freshness for backup files
