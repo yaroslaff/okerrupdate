@@ -10,10 +10,10 @@ DBPASS=
 DBNAME=mysql
 
 # Simplest query, just return 2 if database working
-sum_SQL="SELECT 1+1"
+sqlsum_SQL="SELECT 1+1"
 
 # Count number of user records
-users_SQL="SELECT COUNT(1) FROM user"
+# users_SQL="SELECT COUNT(1) FROM user"
 
 ### COMMON SETTINGS
 
