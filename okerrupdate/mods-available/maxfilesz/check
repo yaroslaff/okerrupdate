@@ -1,0 +1,54 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+
+
+
+def kmgt(sz, frac=1):
+    t = {
+        'K': pow(1024, 1),
+        'M': pow(1024, 2),
+        'G': pow(1024, 3),
+        'T': pow(1024, 4),
+        '': 1}
+
+    for k in sorted(t, key=t.__getitem__, reverse=True):
+        if sz >= t[k]:
+            n = sz / float(t[k])
+            tpl = "{:." + str(frac) + "f}{}"
+            return tpl.format(n, k)
+
+# read parameters
+prefix = os.getenv('PREFIX')
+basename = os.getenv('BASENAME')
+pathlist = os.getenv('PATHLIST','/var/log/')
+recursive = bool(int(os.getenv('RECURSIVE','1')))
+skip = os.getenv('SKIP','')
+maxlim = os.getenv('MAXLIM','100M')
+
+maxsz = 0
+maxfile = None
+
+for curpath in pathlist.split(' '):
+    for dir, dirs, files in os.walk(curpath):
+        for f in files:
+            path = os.path.join(dir, f)
+            if not os.path.isfile(path):
+                continue
+            if skip and re.search(skip, path):
+                continue
+            sz = os.stat(path).st_size
+            if sz>maxsz:
+                maxsz=sz
+                maxfile = path
+
+print("NAME: {}{}".format(prefix, basename))
+print("TAGS: maxfilesz")
+print("METHOD: numerical|maxlim={}".format(maxlim))
+if maxfile:
+    print("DETAILS: {} {}".format(maxfile, kmgt(maxsz)))
+else:
+    print("DETAILS: no files ({} SKIP: {})".format(pathlist, skip))
+print("STATUS: {}".format(maxsz))

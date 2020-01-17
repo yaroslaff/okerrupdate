@@ -1,0 +1,14 @@
+#
+# Env configurational file for 'maxfilesz' check
+#
+
+# Space-separated directories to check (glob)
+# PATHLIST=/var/log /tmp
+PATHLIST=/home/* /root
+
+# value which triggers alert
+MAXLIM=1G
+
+# regex to skip these files (empty: do not skip anything)
+# SKIP=/home/user1|/home/user2
+SKIP=

@@ -1,0 +1,13 @@
+#
+# Env configurational file for 'empty' check
+#
+
+# Space-separated files to check (glob)
+PATHLIST=/var/log/apache2/error.log /var/log/mysql.err
+
+# recursive? if 1 and path ends with '**', it will match any file 
+RECURSIVE=1
+
+# regex to skip these files (empty: do not skip anything)
+# SKIP=/var/log/journal
+SKIP=

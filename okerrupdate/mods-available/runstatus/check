@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import shlex
+import subprocess
+
+VARSUFFIX='_RUN'
+
+# read parameters
+prefix = os.getenv('PREFIX')
+
+for k, v in os.environ.items():
+    if not k.endswith(VARSUFFIX):
+        continue
+    name = k[:-len(VARSUFFIX)]
+    details = ''
+
+    try:
+        r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception as e:
+        code = -1
+        details = str(e)
+    else:
+        code = r.returncode
+        if r.stderr:
+            details = r.stderr.decode().strip().split('\n')[0]
+        else:
+            details = r.stdout.decode().strip().split('\n')[0]
+
+    print("NAME: {}{}".format(prefix, name))
+    print("TAGS: run")
+    print("DETAILS: {}".format(details))
+    print("METHOD: numerical|maxlim=0|minlim=0")
+    print("STATUS: {}".format(code))
+    print()

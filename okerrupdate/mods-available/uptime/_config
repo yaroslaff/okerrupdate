@@ -1,0 +1,12 @@
+#
+# Env configurational file for 'la' check
+#
+
+# value which triggers alert
+MAXLIM=2
+
+# Period is one of 1, 5, 15
+PERIOD=15
+
+# Policy if not default
+POLICY=

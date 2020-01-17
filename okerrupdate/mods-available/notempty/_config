@@ -1,0 +1,16 @@
+#
+# Env configurational file for 'notempty' check
+#
+
+# Space-separated files to check (glob)
+PATHLIST=/var/log/mail.log
+
+# recursive? if 1 and path ends with '**', it will match any file 
+RECURSIVE=1
+
+# Check only files with age older then MAXAGE 
+# To avoid alerts for recently rotated files
+MAXAGE=10m
+
+# regex to skip these files (empty: do not skip anything)
+SKIP=\.\d$|\.gz$

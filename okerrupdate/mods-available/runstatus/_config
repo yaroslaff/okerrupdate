@@ -1,0 +1,33 @@
+#
+# Env configurational file for 'runstatus' check
+#
+
+#
+# This will make indicator prefix:true with status 0 (always OK unless failed) 
+#
+# true_RUN=/bin/true
+
+#
+# This will make indicator prefix:false with status 1 (always ERR) 
+#
+# false_RUN=/bin/false
+
+#
+# This will make indicator prefix:myapache which will be OK if apache2 is running
+#
+apache_RUN="systemctl is-active --quiet apache2"
+
+# nonempty_RUN="test -s /etc/passwd"
+
+# after command: touch /tmp/empty
+# empty_RUN="test ! -s /tmp/empty"
+
+# if URL is available
+# google_RUN = curl --silent --head --fail --output /dev/null http://google.com/
+
+### COMMON SETTINGS
+
+# PREFIX2=run:
+
+# Policy if not default
+POLICY=

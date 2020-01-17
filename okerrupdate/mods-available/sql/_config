@@ -1,0 +1,23 @@
+#
+# Env configurational file for 'mariadb' check
+#
+
+# Database access
+
+DBHOST=localhost
+DBUSER=root
+DBPASS=
+DBNAME=mysql
+
+# Simplest query, just return 2 if database working
+sum_SQL="SELECT 1+1"
+
+# Count number of user records
+users_SQL="SELECT COUNT(1) FROM user"
+
+### COMMON SETTINGS
+
+# PREFIX2=sql:
+
+# Policy if not default
+POLICY=

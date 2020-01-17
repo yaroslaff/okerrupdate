@@ -1,0 +1,78 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+import glob
+import time
+
+def timesuffix2sec(timesuffix):
+    suf = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}
+
+    r = re.match('(\d+)(d|h|m|s|day|days|hour|hours|hr|min|minute|minutes|sec|seconds)?$', timesuffix)
+    if r is None:
+        raise ValueError('Cannot parse \'{}\'. Valid examples are: 10s, 5m, 2h'.format(timesuffix))
+
+    r = re.match('(\d+)([dhmsDHMS])?', timesuffix)
+    if r is None:
+        raise ValueError('Bad time/suffix value {}'.format(timesuffix))
+
+    n = int(r.group(1))
+    try:
+        suffix = r.group(2).lower()
+    except:
+        suffix = 's'
+    return n * suf[suffix]
+
+# read parameters
+prefix = os.getenv('PREFIX')
+basename = os.getenv('BASENAME')
+pathlist = os.getenv('PATHLIST','/var/log/*')
+skip = os.getenv('SKIP','')
+maxage = timesuffix2sec(os.getenv('MAXAGE', '10m'))
+recursive = bool(int(os.getenv('RECURSIVE','1')))
+
+nfiles = 0
+filename = None
+
+n_ok = 0
+
+status = 'OK'
+details = ''
+
+for path in pathlist.split(' '):
+    for curpath in glob.glob(path, recursive=recursive):
+        if not os.path.isfile(curpath):
+            continue
+        if skip and re.search(skip, curpath):
+            continue
+        stat = os.stat(curpath)
+        sz = stat.st_size
+        age = time.time() - stat.st_mtime
+
+        if age<maxage:
+            continue
+
+        if not sz:
+            # empty file. good.
+            n_ok += 1
+            continue
+
+        nfiles += 1
+        filename = curpath
+        status = 'ERR'
+
+if filename:
+    # error
+    if nfiles>1:
+        details = "{} and {} more files".format(filename, nfiles-1)
+    else:
+        details = filename
+else:
+    details = "{} files checked".format(n_ok)
+
+print("NAME: {}{}".format(prefix, basename))
+print("TAGS: {}".format(basename))
+print("METHOD: heartbeat")
+print("DETAILS: {}".format(details))
+print("STATUS: {}".format(status))

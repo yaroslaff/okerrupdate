@@ -1,0 +1,21 @@
+#
+# Env configurational file for 'runstatus' check
+#
+
+#
+# This will make string indicator prefix:myapache 
+#
+apache_RUN="systemctl status apache2"
+# process only lines which matches this regex
+apache_GREP=error
+# case sensitive for grep
+apache_CASE=1
+# return this line (line 0 by default)
+apache_LINE=0
+
+### COMMON SETTINGS
+
+# PREFIX2=run:
+
+# Policy if not default
+POLICY=

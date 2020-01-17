@@ -77,8 +77,9 @@ class UpdateStrAttr(StrAttr):
 
 class InfoStrAttr(StrAttr):
     def __init__(self, s = None):
-        self.Methods = 'check info'
         super().__init__(s)
+        self.set('Version','')
+        self.set('Description','')
 
 class Module:
     def __init__(self, name):
@@ -87,13 +88,18 @@ class Module:
         self.path_available = def_mods_available
         self.path_env = def_env
 
-        if os.path.isfile(name):
+        if os.path.isdir(name):
             path = name
         else:
             path = self.find_module(name)
 
-        out_info = subprocess.run([path, 'info'], stdout = subprocess.PIPE)
-        self.info = InfoStrAttr(out_info.stdout)
+        # out_info = subprocess.run([path, 'info'], stdout = subprocess.PIPE)
+        info_path = os.path.join(path, '_info')
+        self.info = InfoStrAttr()
+        if os.path.isfile(info_path):
+            with open(info_path) as fh:
+                self.info.loads(fh.read())
+
         self._name = os.path.basename(name)
         self._path = os.path.realpath(path)
 
@@ -118,11 +124,14 @@ class Module:
     def check(self, prefix, project, secret=None, dump=False):
 
         env = self.load_env()
+
         env['PREFIX'] = prefix + env.get('PREFIX2','')
         env['BASENAME'] = self._name
 
-        log.debug('... Run check {}'.format(self._path))
-        out_info = subprocess.run([self._path, 'check'], stdout=subprocess.PIPE, env=env)
+        path_check = os.path.join(self._path, 'check')
+
+        log.debug('... Run check {}'.format(path_check))
+        out_info = subprocess.run([path_check], stdout=subprocess.PIPE, env=env)
 
         if args.dump:
             print(out_info.stdout.decode('utf8'))
@@ -134,6 +143,7 @@ class Module:
                 continue
             u = UpdateStrAttr()
             u.set('POLICY', env.get('POLICY'))
+            u.set('NAME', prefix+self._name)
             try:
                 u.loads(update)
             except ValueError:
@@ -153,14 +163,16 @@ class Module:
         return False
 
     def has_method(self, method):
-        return method in self.info.Methods.split(' ')
+        path_method = os.path.join(self._path, method)
+        return os.path.isfile(path_method)
 
     def enable(self):
         log.info("enable {}".format(self._path))
         envfile = os.path.join(self.path_env, self._name)
 
         if self.has_method('preenable'):
-            s = subprocess.run([self._path, 'preenable'], stdout=subprocess.PIPE)
+
+            s = subprocess.run([os.path.join(self._path, 'preenable')], stdout=subprocess.PIPE)
             if s.returncode:
                 log.error(s.stdout.decode().strip())
                 log.error("Pre-enable check failed.")
@@ -214,6 +226,13 @@ def listdirs(dirs):
         for basename in os.listdir(d):
             yield os.path.join(d, basename)
 
+def uniq(iterable):
+    last = None
+    for e in iterable:
+        if e == last:
+            continue
+        last = e
+        yield e
 
 # main code
 conf_file = '/etc/okerr/okerrupdate'
@@ -276,7 +295,9 @@ else:
 
 if args.list:
     listed = list()
-    for path in sorted(listdirs([def_mods_enabled, def_mods_available])):
+    for path in uniq(sorted(listdirs([def_mods_enabled, def_mods_available]))):
+        if not os.path.isdir(path):
+            continue
         m = Module(path)
         if m._path in listed:
             continue

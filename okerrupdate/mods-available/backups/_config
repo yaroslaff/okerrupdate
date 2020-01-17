@@ -1,0 +1,30 @@
+#
+# Env configurational file for 'maxfilesz' check
+#
+
+# Space-separated files to check (glob)
+# PATHLIST=/var/log 
+PATHLIST=/var/mybackups/*gz
+
+# Which backups (age) we report to server. Use seconds or use suffix d,h,m or s
+FRESH=1d
+
+# DATE format in your backup files (regex)
+# default matches backups like name-2019-12-31.tar.gz
+# indicator name will be name-DATE.tar.gz
+DATEFMT=\d[\d\-]{6,}\d
+
+# date regex will be replaced to DATESUB value
+DATESUB=DATE
+
+# alert if backup is smaller then this size (e.g. if empty file or empty tar.gz file)
+MINLIM=10k
+
+# use to set diffmin. if DIFFMIN=0, alert will be send if new backup is smaller then older
+DIFFMIN=0
+
+# use this for secondary prefix: hostname:backups:name-DATE.tar.gz instead or hostname:name-DATE.tar.gz
+#PREFIX2=backups:
+
+# regex to skip these files (empty: do not skip anything)
+SKIP=

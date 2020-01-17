@@ -1,0 +1,64 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+
+# read parameters
+prefix = os.getenv('PREFIX')
+basename = os.getenv('BASENAME')
+
+dbhost = os.getenv('DBHOST', 'localhost')
+dbuser = os.getenv('DBUSER', '')
+dbpass = os.getenv('DBPASS', '')
+dbname = os.getenv('DBNAME', '')
+
+
+try:
+
+    import MySQLdb
+
+    db = MySQLdb.connect(
+        host=dbhost,
+        user=dbuser,
+        passwd=dbpass,
+        database=dbname)
+
+except Exception as e:
+    print("NAME: {}{}".format(prefix, basename))
+    print("TAGS: {}".format(basename))
+    print("METHOD: numerical")
+    print("DETAILS: {}".format(str(e)))
+    print("STATUS: {}".format(-1))
+    sys.exit()
+
+VARSUFFIX = '_SQL'
+
+for k, v in os.environ.items():
+    if not k.endswith(VARSUFFIX):
+        continue
+
+    try:
+        name = k[:-len(VARSUFFIX)]
+
+        query = v
+        cur = db.cursor()
+        cur.execute(query)
+        value = cur.fetchone()[0]
+        details = "{}: {}".format(query, value)
+
+        print("NAME: {}{}".format(prefix, name))
+        print("TAGS: {}".format(basename))
+        print("METHOD: numerical")
+        print("DETAILS: {}".format(details))
+        print("STATUS: {}".format(value))
+        print()
+
+    except Exception as e:
+        print("NAME: {}{}".format(prefix, basename))
+        print("TAGS: {}".format(basename))
+        print("METHOD: numerical")
+        print("DETAILS: {}".format(str(e)))
+        print("STATUS: {}".format(-1))
+        print()
+

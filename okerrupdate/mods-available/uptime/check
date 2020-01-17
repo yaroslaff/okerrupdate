@@ -1,0 +1,38 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import time
+import psutil
+
+
+def s2dhms(sec):
+    s = ""
+    intervals = (
+        ('d', 86400),
+        ('h', 3600),
+        ('m', 60),
+        ('s', 1)
+    )
+
+    for suffix, num in intervals:
+        if sec > num:
+            c = int(sec / num)
+            s += "{}{} ".format(c, suffix)
+            sec -= c * num
+    return s
+
+# read parameters
+prefix = os.getenv('PREFIX')
+basename = os.getenv('BASENAME')
+
+bt = int(psutil.boot_time())
+now = int(time.time())
+uptime = now - bt
+details = s2dhms(uptime)
+
+print("NAME: {}{}".format(prefix, basename))
+print("TAGS: uptime")
+print("DETAILS: {}".format(details))
+print("METHOD: numerical|diffmin=0")
+print("STATUS: {}".format(uptime))

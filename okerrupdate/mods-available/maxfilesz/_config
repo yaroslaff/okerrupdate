@@ -1,0 +1,18 @@
+#
+# Env configurational file for 'maxfilesz' check
+#
+
+# Space-separated directories to check
+# PATHLIST=/var/log /tmp
+PATHLIST=/var/log
+
+# Process recursively. 0 or 1.
+# RECURSIVE=0
+RECURSIVE=1
+
+# value which triggers alert
+MAXLIM=100M
+
+# regex to skip these files (empty: do not skip anything)
+# default: skip files ending with dot-number and .gz
+SKIP=\.\d+$|\.gz$

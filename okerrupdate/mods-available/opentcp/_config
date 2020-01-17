@@ -1,0 +1,38 @@
+# Only connections with this status (regex)
+STATUS=LISTEN
+
+# Only connections with this local address (regex)
+
+# only IPv4 world-listening
+LADDR=0.0.0.0 
+
+# IPv4+IPv6
+# LADDR=0.0.0.0|:: 
+
+
+# Skip these ports
+# SKIP_PORT=80 22
+SKIP_PORT=
+
+
+# Skip if exe matches this (regex)
+# SKIP_EXE=.*/sshd # do not list sshd
+SKIP_EXE=
+
+
+#
+# FORMAT
+# format may include fields:
+# name pid basename exe proto ip port status
+
+
+# format for each listening process in status
+FORMAT={port}
+
+# format for each listening process in details
+DFORMAT={port}:{name}
+
+### COMMON SETTINGS
+
+# Policy if not default
+POLICY=

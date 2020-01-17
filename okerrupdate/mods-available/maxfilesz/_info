@@ -1,0 +1,4 @@
+Protocol: 0.1
+Description: Maximum log size
+Version: 0.1
+Methods: check makeconfig info

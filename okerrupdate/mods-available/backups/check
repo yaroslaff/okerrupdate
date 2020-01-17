@@ -1,0 +1,70 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import glob
+import time
+import re
+
+def kmgt(sz, frac=1):
+    t = {
+        'K': pow(1024, 1),
+        'M': pow(1024, 2),
+        'G': pow(1024, 3),
+        'T': pow(1024, 4),
+        '': 1}
+
+    for k in sorted(t, key=t.__getitem__, reverse=True):
+        if sz >= t[k]:
+            n = sz / float(t[k])
+            tpl = "{:." + str(frac) + "f}{}"
+            return tpl.format(n, k)
+
+def timesuffix2sec(timesuffix):
+    suf = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}
+
+    r = re.match('(\d+)(d|h|m|s|day|days|hour|hours|hr|min|minute|minutes|sec|seconds)?$', timesuffix)
+    if r is None:
+        raise ValueError('Cannot parse \'{}\'. Valid examples are: 10s, 5m, 2h'.format(timesuffix))
+
+    r = re.match('(\d+)([dhmsDHMS])?', timesuffix)
+    if r is None:
+        raise ValueError('Bad time/suffix value {}'.format(timesuffix))
+
+    n = int(r.group(1))
+    try:
+        suffix = r.group(2).lower()
+    except:
+        suffix = 's'
+    return n * suf[suffix]
+
+# read parameters
+prefix = os.getenv('PREFIX')
+pathlist = os.getenv('PATHLIST','/var/mybackups/*')
+fresh = timesuffix2sec(os.getenv('FRESH','1d'))
+date = os.getenv('DATEFMT','[0-9][0-9\-]{7,}')
+datesub = os.getenv('DATESUB','DATE')
+minlim = os.getenv('MINLIM','10k')
+diffmin = os.getenv('DIFFMIN','0')
+skip = os.getenv('SKIP','')
+
+for path in pathlist.split(' '):
+    for curpath in glob.glob(path):
+
+        if skip and re.search(skip, curpath):
+            continue
+
+        if time.time() - os.stat(curpath).st_mtime > fresh:
+            continue
+
+        tpl = re.sub(date, datesub, os.path.basename(curpath))
+        sz = os.stat(curpath).st_size
+        print("TPL: {}".format(tpl))
+
+        print("NAME: {}{}".format(prefix, tpl))
+        print("TAGS: backups")
+        print("DETAILS: {}: {}".format(os.path.basename(curpath), kmgt(sz)))
+        print("METHOD: numerical|minlim={}|diffmin={}".format(minlim, diffmin))
+        print("STATUS: {}".format(sz))
+        print()
+

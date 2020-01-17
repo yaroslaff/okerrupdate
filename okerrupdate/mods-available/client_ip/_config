@@ -1,0 +1,11 @@
+# default URL
+URL=https://diagnostic.opendns.com/myip
+
+# Alternate URLS
+# URL=https://ifconfig.me
+# URL=https://ifconfig.me
+
+USER_AGENT=curl/7.58.0
+
+# Policy if not default
+POLICY=

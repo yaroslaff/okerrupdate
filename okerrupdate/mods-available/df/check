@@ -1,0 +1,52 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import psutil
+import re
+import shutil
+
+def kmgt(sz, frac=1):
+    t = {
+        'K': pow(1024, 1),
+        'M': pow(1024, 2),
+        'G': pow(1024, 3),
+        'T': pow(1024, 4),
+        '': 1}
+
+    for k in sorted(t, key=t.__getitem__, reverse=True):
+        if sz >= t[k]:
+            n = sz / float(t[k])
+            tpl = "{:." + str(frac) + "f}{}"
+            return tpl.format(n, k)
+
+# read parameters
+prefix = os.getenv('PREFIX')
+maxlim = int(os.getenv('MAXLIM','90'))
+ignore_device = os.getenv('IGNORE_DEVICE','^/dev/loop')
+ignore_mount = os.getenv('IGNORE_MOUNT','')  # '^/media/|^/snap/'
+
+for p in psutil.disk_partitions():
+    # print("?", p)
+    if ignore_device:
+        if re.search(ignore_device, p.device):
+            #print("ignore device", ignore_device)
+            continue
+    if ignore_mount:
+        if re.search(ignore_mount, p.mountpoint):
+            #print("ignore device", ignore_device)
+            continue
+    u = shutil.disk_usage(p.mountpoint)
+    perc = u.used * 100 / u.total
+    total = kmgt(u.total)
+    used = kmgt(u.used)
+    free = kmgt(u.free)
+
+    data="""
+NAME: {prefix}df-{mount}
+TAGS: la
+METHOD: numerical|maxlim={maxlim}
+DETAILS: {perc:.2f}%, {used}/{total} used, {free} free
+STATUS: {perc:.2f}
+""".lstrip().format(prefix=prefix, maxlim=maxlim, mount=p.mountpoint, perc=perc, used=used, total=total, free=free)
+    print(data)
