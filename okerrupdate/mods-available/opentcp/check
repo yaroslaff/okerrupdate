@@ -69,7 +69,7 @@ for p in psutil.process_iter():
         fails += 1
         pass
 
-portstr = ' '.join(sorted(format.format(**cs) for cs in outdata))
+portstr = ' '.join(sorted((format.format(**cs) for cs in outdata), key=int))
 d = ' '.join(sorted(dformat.format(**cs) for cs in outdata))
 print("NAME: {}opentcp".format(prefix))
 print("TAGS: opentcp")
