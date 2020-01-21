@@ -287,7 +287,8 @@ def main():
 
     parser = argparse.ArgumentParser(description='Micro okerr update utility.')
     parser.add_argument(metavar='MODULE', dest='modlist', nargs='*',
-                        help='module(s) by name or mod directory (wildcard)')
+                        help='module(s) by name or mod directory (wildcard)',
+                        default=glob.glob(os.path.join(def_mods_enabled,'*')))
     parser.add_argument('-p', '--prefix', metavar='PREFIX', default=def_prefix, nargs='?',
                         help='prefix for indicator. default: {}'.format(def_prefix))
     parser.add_argument('-i', '--textid', metavar='TextID', default=def_textid,
@@ -324,8 +325,7 @@ def main():
 
     # log.removeHandler(log.handlers[0])
     out = logging.StreamHandler(sys.stdout)
-    out.setFormatter(logging.Formatter('%(asctime)s %(message)s',
-                                       datefmt='%Y/%m/%d %H:%M:%S'))
+    out.setFormatter(logging.Formatter('%(message)s'))
     out.setLevel(logging.DEBUG)
     log.addHandler(out)
 
@@ -416,13 +416,16 @@ def main():
         log.addHandler(fh)
         oulog.addHandler(fh)
 
-    p = okerrupdate.OkerrProject(args.textid, url=args.url, direct=args.direct)
+    # if we're here: run
+    p = okerrupdate.OkerrProject(args.textid, url=args.url, direct=args.direct, dry_run=args.dry)
     if args.verbose >= 2:
         p.verbose()
 
-    # if we're here: run
     for mod_spec in args.modlist:
         mod_path = Module.find_module(mod_spec)
+        if mod_path is None:
+            log.error('No module: {}'.format(mod_spec))
+            continue
         m = Module(mod_path=mod_path)
         m.check(prefix=args.prefix, project=p, secret=args.secret, dump=args.dump)
 
