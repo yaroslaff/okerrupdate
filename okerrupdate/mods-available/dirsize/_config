@@ -12,3 +12,12 @@ MAXLIM=1G
 # regex to skip these files (empty: do not skip anything)
 # SKIP=/home/user1|/home/user2
 SKIP=
+
+
+### COMMON SETTINGS
+
+# PREFIX2=dirsize:
+
+# Policy if not default
+POLICY=
+
