@@ -42,6 +42,8 @@ basename = os.getenv('BASENAME')
 pathlist = os.getenv('PATHLIST','/root /home/*')
 maxlim = os.getenv('MAXLIM','1G')
 skip = os.getenv('SKIP','')
+fullpath = int(os.getenv('FULLPATH','0'))
+
 
 for path in pathlist.split(' '):
     for curpath in glob.glob(path):
@@ -50,7 +52,7 @@ for path in pathlist.split(' '):
 
         sz = du(curpath)
 
-        print("NAME: {}{}-{}".format(prefix, basename, curpath))
+        print("NAME: {}{}".format(prefix, curpath if fullpath else os.path.basename(curpath)))
         print("TAGS: dirsize")
         print("METHOD: numerical|maxlim={}".format(maxlim))
         print("DETAILS: {}".format(kmgt(sz)))

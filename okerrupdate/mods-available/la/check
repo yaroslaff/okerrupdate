@@ -7,6 +7,7 @@ import sys
 prefix = os.getenv('PREFIX')
 period = int(os.getenv('PERIOD','15'))
 maxlim = int(os.getenv('MAXLIM','2'))
+basename = os.getenv('BASENAME')
 
 if period not in [1, 5, 15]:
     period=15
@@ -20,7 +21,7 @@ elif period == 5:
 else:
     la = load15
 
-print("NAME: {}la".format(prefix))
+print("NAME: {}{}".format(prefix, basename))
 print("TAGS: la")
 print("METHOD: numerical|maxlim={}".format(maxlim))
 print("STATUS: {}".format(la))
