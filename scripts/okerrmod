@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import okerrupdate
 import argparse
 import socket
@@ -47,8 +47,10 @@ def parse_dotenv(dotenv_path):
 class StrAttr:
     def __init__(self, s=None):
         self._keys = list()
+        self.comment = '#'
         if s:
             self.loads(s)
+
 
     def loads(self, s):
         if isinstance(s, bytes):
@@ -56,6 +58,8 @@ class StrAttr:
 
         for line in str(s).split('\n'):
             if not line:
+                continue
+            if self.comment and line.startswith(self.comment):
                 continue
             k, v = line.split(':', 1)
             v = v.strip()
