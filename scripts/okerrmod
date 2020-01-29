@@ -80,7 +80,7 @@ class UpdateStrAttr(StrAttr):
     def __init__(self, s=None, name='noname'):
         self.METHOD = 'heartbeat'
         self.NAME = name
-        self.STATUS = 'OK'
+        self.STATUS = None
         self.DETAILS = ''
         self.POLICY = 'Default'
         self.TAGS = ''
@@ -182,9 +182,10 @@ class Module:
                 log.error("Failed to parse {!r} from {}".format(update, self._path))
 
             log.debug(u)
-            i = project.indicator(u.NAME, secret=secret,
-                                  method=u.METHOD, policy=u.POLICY, tags=u.TAGS.split(' '))
-            i.update(u.STATUS, details=u.DETAILS)
+            if u.STATUS is not None:
+                i = project.indicator(u.NAME, secret=secret,
+                                      method=u.METHOD, policy=u.POLICY, tags=u.TAGS.split(' '))
+                i.update(u.STATUS, details=u.DETAILS)
 
     def enabled(self):
         for basename in os.listdir(self.path_enabled):
