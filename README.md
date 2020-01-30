@@ -10,11 +10,17 @@ sudo vim /etc/okerr/okerrupdate
 
 and modify okerrupdate file:
 ~~~
-OKERR_TEXTID=MyTextID
-OKERR_SECRET=MySecret
+# Stub for okerrmod            
+PREFIX=braconnier:
+OKERR_TEXTID=
+OKERR_SECRET=
+OKERR_URL=
+OKERR_DIRECT=0
 
 OKERR_MOD_AVAIL=
 ~~~
+or provide values to `okerrmod --init` as option values (e.g. `okerrmod --init --textid MyTextid`).
+
 
 ## Basic usage
 

@@ -6,7 +6,7 @@ import time
 import sys
 import os
 
-from urllib.parse import urlparse, urljoin
+from urllib.parse import urljoin
 
 
 class OkerrExc(Exception):
@@ -69,18 +69,15 @@ class OkerrProject:
     url = None # base url, for director
     project_url = None
     
-    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=False, config=None):
+    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=None, config=None):
         self.textid = textid or os.getenv('OKERR_TEXTID')
-        self.url = url
         self.dry_run = dry_run
         self.secret = secret or os.getenv('OKERR_SECRET')
         self.url_expiration = 300
-        self.direct = direct
+        self.direct = direct if isinstance(direct, bool) else bool(int(os.getenv('OKERR_DIRECT','0')))
         self.x = dict()
-        if url:
-            self.url = url
-        else:
-            self.url = 'https://cp.okerr.com/' 
+        self.url = url or os.getenv('OKERR_URL', '') or 'https://cp.okerr.com/'
+
 
         self.make_logger()
 

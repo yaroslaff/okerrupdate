@@ -289,6 +289,8 @@ def main():
     def_prefix = os.getenv('PREFIX', socket.gethostname().split('.')[0]+':')
     def_secret = os.getenv('OKERR_SECRET', None)
     def_textid = os.getenv('OKERR_TEXTID', None)
+    def_direct = bool(int(os.getenv('OKERR_DIRECT','0')))
+    def_url = os.getenv('OKERR_URL', None)
 
     parser = argparse.ArgumentParser(description='Micro okerr update utility.')
     parser.add_argument(metavar='MODULE', dest='modlist', nargs='*',
@@ -298,9 +300,9 @@ def main():
                         help='prefix for indicator. default: {}'.format(def_prefix))
     parser.add_argument('-i', '--textid', metavar='TextID', default=def_textid,
                         help='Project textid ({!r})'.format(def_textid))
-    parser.add_argument('--url', metavar='URL', help='URL of server (usually not needed)', default=None)
+    parser.add_argument('--url', metavar='URL', help='URL of server (usually not needed)', default=def_url)
     parser.add_argument('--direct', action='store_true',
-                        help='Do not use director feature, use direct --url', default=False)
+                        help='Do not use director feature, use direct --url', default=def_direct)
     parser.add_argument('-S', '--secret', metavar='SECRET', help='SECRET', default=def_secret)
     # Policy not actual here, because different mods may need different policies
     # parser.add_argument('-p','--policy', metavar='POLICY', help='use this policy by default ', default='Default')
@@ -395,11 +397,18 @@ def main():
                 fh.write("""
 # Stub for okerrmod            
 PREFIX={prefix}
-OKERR_TEXTID=
-OKERR_SECRET=
+OKERR_TEXTID={textid}
+OKERR_SECRET={secret}
+OKERR_URL={url}
+OKERR_DIRECT={direct}
 
 OKERR_MOD_AVAIL=
-""".lstrip().format(prefix=args.prefix))
+""".lstrip().format(prefix=args.prefix,
+                    textid=args.textid or '',
+                    secret=args.secret or '',
+                    url=args.url or '',
+                    direct=1 if args.direct else 0
+                ))
 
         for mod_spec in mods:
             mod_path = Module.find_module(mod_spec)
