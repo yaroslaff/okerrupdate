@@ -1,0 +1,7 @@
+#!/usr/bin/python3
+
+import os
+
+print("TAGS: version")
+print("METHOD: string")
+print("STATUS: {}".format(os.getenv('VERSION', 'no version info')))
