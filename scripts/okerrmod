@@ -8,6 +8,7 @@ import shutil
 import sys
 import logging
 import glob
+import random
 from dotenv import load_dotenv
 
 def_mods_enabled = '/etc/okerr/mods-enabled/'
@@ -159,11 +160,12 @@ class Module:
 
         env['PREFIX'] = prefix + env.get('PREFIX2', '')
         env['BASENAME'] = self._name
+        env['VERSION'] = okerrupdate.__version__
 
         path_check = self.mod_file('check')
 
         log.debug('... Run check {}'.format(path_check))
-        out_info = subprocess.run([path_check], stdout=subprocess.PIPE, env=env)
+        out_info = subprocess.run([path_check, self.name], stdout=subprocess.PIPE, env=env)
 
         if dump:
             print(out_info.stdout.decode('utf8'))
@@ -276,6 +278,13 @@ def uniq(iterable):
         last = e
         yield e
 
+def read_template(path, tokens):
+    with open(path, "r") as srcf:
+        data = srcf.read()
+        for token, value in tokens:
+            data = data.replace(token, value)
+        return data
+
 
 def main():
 
@@ -292,7 +301,7 @@ def main():
     def_direct = bool(int(os.getenv('OKERR_DIRECT','0')))
     def_url = os.getenv('OKERR_URL', None)
 
-    parser = argparse.ArgumentParser(description='Micro okerr update utility.')
+    parser = argparse.ArgumentParser(description='okerr module manager {}'.format(okerrupdate.__version__))
     parser.add_argument(metavar='MODULE', dest='modlist', nargs='*',
                         help='module(s) by name or mod directory (wildcard)',
                         default=glob.glob(os.path.join(def_mods_enabled,'*')))
@@ -378,6 +387,7 @@ def main():
         sys.exit()
 
     if args.init:
+
         if not os.getuid() == 0:
             log.error("You must be root to --init and make /etc/okerr")
             exit(1)
@@ -415,11 +425,20 @@ OKERR_MOD_AVAIL=
             m = Module(mod_path)
             m.enable()
 
-        src = os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod')
-        dst = '/etc/cron.d/okerrmod'
-        if not os.path.exists('/etc/cron.d/okerrmod'):
-            log.info('Copy {} to {}'.format(src, dst))
-            shutil.copy(src, dst)
+
+        offset = random.randrange(20)
+        tokens = {
+            ('%OKERRMOD%', os.path.realpath(__file__)),
+            ('%MINUTES%', ','.join(map(str, [offset, offset+20, offset+40])))
+        }
+
+        crondata = read_template(os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod'), tokens)
+
+        cronjob = '/etc/cron.d/okerrmod'
+        if not os.path.exists(cronjob):
+            with open(cronjob, 'w') as fh:
+                print("Generate", cronjob)
+                fh.write(crondata)
 
         exit()
 

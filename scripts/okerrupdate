@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from okerrupdate import OkerrProject, OkerrExc
+from okerrupdate import OkerrProject, OkerrExc, __version__
 from dotenv import load_dotenv
 import argparse
 import os
@@ -7,7 +7,7 @@ import os
 conf_file = '/etc/okerr/okerrupdate'
 load_dotenv(dotenv_path = conf_file)
 
-parser = argparse.ArgumentParser(description='Micro okerr update utility.')
+parser = argparse.ArgumentParser(description='Micro okerr update utility {}'.format(__version__))
 parser.add_argument('name', metavar='INAME', help='name of indicator (name@textid)')
 parser.add_argument('value', metavar='VALUE', help='value')
 parser.add_argument('-i','--textid', metavar='TextID', help='name of indicator',

@@ -1,12 +1,13 @@
 from setuptools import setup
 import os
+import okerrupdate
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 
 setup(name='okerrupdate',
-    version='1.2.21',
+    version=okerrupdate.__version__,
     description='client-side okerr module and utilities',
     url='https://gitlab.com/yaroslaff/okerrupdate',
     author='Yaroslav Polyakov',
