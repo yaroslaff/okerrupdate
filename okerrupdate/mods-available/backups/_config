@@ -21,7 +21,7 @@ DATESUB=DATE
 MINLIM=10k
 
 # use to set diffmin. if DIFFMIN=0, alert will be send if new backup is smaller then older
-DIFFMIN=0
+DIFFMIN=-10%
 
 # use this for secondary prefix: hostname:backups:name-DATE.tar.gz instead or hostname:name-DATE.tar.gz
 #PREFIX2=backups:

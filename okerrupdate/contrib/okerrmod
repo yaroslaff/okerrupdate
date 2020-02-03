@@ -1,2 +1,2 @@
-%MINUTES% * * * *        root        %OKERRMOD% --log /var/log/okerrmod.log
+%MINUTES% * * * *        root        %VENV%/bin/python3 %OKERRMOD% --log /var/log/okerrmod.log
 
