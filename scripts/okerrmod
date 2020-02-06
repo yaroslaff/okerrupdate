@@ -165,7 +165,7 @@ class Module:
         path_check = self.mod_file('check')
 
         log.debug('... Run check {}'.format(path_check))
-        out_info = subprocess.run([path_check, self.name], stdout=subprocess.PIPE, env=env)
+        out_info = subprocess.run([sys.executable, path_check, self.name], stdout=subprocess.PIPE, env=env)
 
         if dump:
             print(out_info.stdout.decode('utf8'))
@@ -428,6 +428,7 @@ OKERR_MOD_AVAIL=
 
         offset = random.randrange(20)
         tokens = {
+            ('%PYTHON%', sys.executable),
             ('%OKERRMOD%', os.path.realpath(__file__)),
             ('%MINUTES%', ','.join(map(str, [offset, offset+20, offset+40])))
         }
