@@ -36,7 +36,7 @@ def my_du(path):
     return total
 
 def sys_du(path):
-    r = subprocess.run(['du','-s', path], stdout=subprocess.PIPE)
+    r = subprocess.run(['du','-bs', path], stdout=subprocess.PIPE)
     if r.returncode != 0:
         return -1
 
@@ -53,11 +53,11 @@ def du(path):
 prefix = os.getenv('PREFIX')
 basename = os.getenv('BASENAME')
 
-pathlist = os.getenv('PATHLIST','/root /home/*')
-maxlim = os.getenv('MAXLIM','1G')
-skip = os.getenv('SKIP','')
-fullpath = int(os.getenv('FULLPATH','0'))
-use_du = int(os.getenv('USE_DU','0'))
+pathlist = os.getenv('PATHLIST', '/root /home/*')
+maxlim = os.getenv('MAXLIM', '1G')
+skip = os.getenv('SKIP', '')
+fullpath = int(os.getenv('FULLPATH', '0'))
+use_du = int(os.getenv('USE_DU', '1'))
 
 for path in pathlist.split(' '):
     for curpath in glob.glob(path):
