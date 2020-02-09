@@ -2,7 +2,7 @@
 
 import os
 import re
-import sys
+import subprocess
 import glob
 
 def kmgt(sz, frac=1):
@@ -19,7 +19,7 @@ def kmgt(sz, frac=1):
             tpl = "{:." + str(frac) + "f}{}"
             return tpl.format(n, k)
 
-def du(path):
+def my_du(path):
     total = 0
 
     if os.path.isfile(path):
@@ -35,6 +35,20 @@ def du(path):
                 pass
     return total
 
+def sys_du(path):
+    r = subprocess.run(['du','-s', path], stdout=subprocess.PIPE)
+    if r.returncode != 0:
+        return -1
+
+    sz = int(r.stdout.decode().split('\t')[0])
+    return sz
+
+def du(path):
+    if use_du:
+        return sys_du(path)
+    else:
+        return my_du(path)
+
 # read parameters
 prefix = os.getenv('PREFIX')
 basename = os.getenv('BASENAME')
@@ -43,18 +57,20 @@ pathlist = os.getenv('PATHLIST','/root /home/*')
 maxlim = os.getenv('MAXLIM','1G')
 skip = os.getenv('SKIP','')
 fullpath = int(os.getenv('FULLPATH','0'))
-
+use_du = int(os.getenv('USE_DU','0'))
 
 for path in pathlist.split(' '):
     for curpath in glob.glob(path):
         if skip and re.search(skip, curpath):
+            print('# skip {}'.format(curpath))
             continue
+        print('# count {}'.format(curpath))
 
         sz = du(curpath)
 
         print("NAME: {}{}".format(prefix, curpath if fullpath else os.path.basename(curpath)))
         print("TAGS: dirsize")
-        print("METHOD: numerical|maxlim={}".format(maxlim))
+        print("METHOD: numerical|maxlim={}|minlim=0".format(maxlim))
         print("DETAILS: {}".format(kmgt(sz)))
         print("STATUS: {}".format(sz))
         print()

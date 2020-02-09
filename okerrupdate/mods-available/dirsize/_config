@@ -16,6 +16,9 @@ SKIP=
 # Use 1 to use full path in indicator names
 FULLPATH=0
 
+# Use 'du' utility (much faster). 0 or 1
+USE_DU=1
+
 ### COMMON SETTINGS
 
 # PREFIX2=dirsize:
