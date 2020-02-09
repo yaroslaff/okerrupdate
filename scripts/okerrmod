@@ -21,6 +21,8 @@ def_mods_available = [
 def_env = '/etc/okerr/mods-env/'
 log = None
 
+class NoModule(Exception):
+    pass
 
 def decode_escaped(s):
     return s
@@ -99,6 +101,9 @@ class InfoStrAttr(StrAttr):
 
 class Module:
     def __init__(self, mod_path):
+
+        if mod_path is None:
+            raise NoModule('No such module: {}'.format(mod_path))
 
         self.path_enabled = def_mods_enabled
         self.path_available = def_mods_available
@@ -369,7 +374,7 @@ def main():
             modpath = Module.find_module(modspec)
             try:
                 m = Module(modpath)
-            except ValueError as e:
+            except (ValueError, NoModule) as e:
                 log.error(e)
             else:
                 m.enable()
@@ -380,7 +385,7 @@ def main():
             modpath = Module.find_module(modspec)
             try:
                 m = Module(modpath)
-            except ValueError as e:
+            except (ValueError, NoModule) as e:
                 log.error(e)
             else:
                 m.disable()
