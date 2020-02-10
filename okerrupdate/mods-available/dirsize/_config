@@ -9,14 +9,14 @@ PATHLIST=/home/* /root
 # value which triggers alert
 MAXLIM=1G
 
-# regex to skip these files (empty: do not skip anything)
-# SKIP=/home/user1|/home/user2
+# space-separated glob to skip these files (empty: do not skip anything)
+# SKIP=/var/lib/lxc/*/snaps/* /var/lib/lxc/lxc-monitord.log
 SKIP=
 
 # Use 1 to use full path in indicator names
 FULLPATH=0
 
-# Use 'du' utility (much faster). 0 or 1
+# Use system 'du' utility (much faster). 0 or 1
 USE_DU=1
 
 ### COMMON SETTINGS

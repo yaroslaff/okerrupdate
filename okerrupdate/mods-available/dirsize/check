@@ -4,6 +4,7 @@ import os
 import re
 import subprocess
 import glob
+import fnmatch
 
 def kmgt(sz, frac=1):
     t = {
@@ -19,7 +20,7 @@ def kmgt(sz, frac=1):
             tpl = "{:." + str(frac) + "f}{}"
             return tpl.format(n, k)
 
-def my_du(path):
+def my_du(path, skip):
     total = 0
 
     if os.path.isfile(path):
@@ -28,6 +29,8 @@ def my_du(path):
     for root, dirs, files in os.walk(path, topdown=False):
         for f in files:
             filepath = os.path.join(root, f)
+            if should_skip(filepath, skip):
+                continue
             try:
                 if os.path.isfile(filepath) and not os.path.islink(filepath):
                     total += os.path.getsize(filepath)
@@ -35,19 +38,32 @@ def my_du(path):
                 pass
     return total
 
-def sys_du(path):
-    r = subprocess.run(['du','-bs', path], stdout=subprocess.PIPE)
+def sys_du(path, skip):
+    cmdline = ['du', '-bs', path]
+    for sg in skip.split(' '):
+        cmdline.append('--exclude={}'.format(sg))
+
+    print('# run: {}'.format(cmdline))
+    r = subprocess.run(cmdline, stdout=subprocess.PIPE)
     if r.returncode != 0:
         return -1
 
     sz = int(r.stdout.decode().split('\t')[0])
     return sz
 
-def du(path):
+def du(path, skip):
     if use_du:
-        return sys_du(path)
+        return sys_du(path, skip)
     else:
-        return my_du(path)
+        return my_du(path, skip)
+
+def should_skip(path, skip):
+
+    for g in skip.split(' '):
+        if fnmatch.fnmatch(path, g):
+            return True
+    return False
+
 
 # read parameters
 prefix = os.getenv('PREFIX')
@@ -61,12 +77,12 @@ use_du = int(os.getenv('USE_DU', '1'))
 
 for path in pathlist.split(' '):
     for curpath in glob.glob(path):
-        if skip and re.search(skip, curpath):
+        if should_skip(curpath, skip):
             print('# skip {}'.format(curpath))
             continue
         print('# count {}'.format(curpath))
 
-        sz = du(curpath)
+        sz = du(curpath, skip)
 
         print("NAME: {}{}".format(prefix, curpath if fullpath else os.path.basename(curpath)))
         print("TAGS: dirsize")
