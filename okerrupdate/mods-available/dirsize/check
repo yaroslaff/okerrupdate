@@ -44,9 +44,11 @@ def sys_du(path, skip):
         cmdline.append('--exclude={}'.format(sg))
 
     print('# run: {}'.format(cmdline))
-    r = subprocess.run(cmdline, stdout=subprocess.PIPE)
-    if r.returncode != 0:
+    r = subprocess.run(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    if r.returncode not in [0, 1]:
+        # exit code 1 is OK, when file disappeared during process
         sys.stderr.write("cmd: {} returncode: {}".format(cmdline, r.returncode))
+        sys.stderr.write(r.stderr)
         return -1
 
     sz = int(r.stdout.decode().split('\t')[0])
