@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import os
-import re
+import sys
 import subprocess
 import glob
 import fnmatch
@@ -46,6 +46,7 @@ def sys_du(path, skip):
     print('# run: {}'.format(cmdline))
     r = subprocess.run(cmdline, stdout=subprocess.PIPE)
     if r.returncode != 0:
+        sys.stderr.write("cmd: {} returncode: {}".format(cmdline, r.returncode))
         return -1
 
     sz = int(r.stdout.decode().split('\t')[0])

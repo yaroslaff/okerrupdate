@@ -170,7 +170,11 @@ class Module:
         path_check = self.mod_file('check')
 
         log.debug('... Run check {}'.format(path_check))
-        out_info = subprocess.run([sys.executable, path_check, self.name], stdout=subprocess.PIPE, env=env)
+        out_info = subprocess.run([sys.executable, path_check, self.name], stdout=subprocess.PIPE,
+                                  stderr=subprocess.PIPE, env=env)
+
+        if out_info.stderr:
+            log.error("CHECK ERR: {}".format(out_info.stderr.decode('utf-8')))
 
         if dump:
             print(out_info.stdout.decode('utf8'))
