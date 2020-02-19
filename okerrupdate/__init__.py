@@ -137,7 +137,7 @@ class OkerrProject:
             tags = tags, error = error, origkeypath = origkeypath, keypath = keypath)
         return i
 
-    def update(self,name, status, details=None, secret=None, desc=None,
+    def update(self, name, status, details=None, secret=None, desc=None,
         method=None, policy='Default', tags=None, error=None, origkeypath=None, keypath=None):
         if self.dry_run:
             self.log.debug('Do NOT update: dry run. {} = {}'.format(name, repr(status)))            
@@ -167,7 +167,7 @@ class OkerrProject:
             return
 
         if not url.endswith('/'):
-            url+='/'
+            url += '/'
             
         url = url+'update'
         
