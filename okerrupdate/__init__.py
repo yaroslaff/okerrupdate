@@ -7,7 +7,7 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.34'
+__version__ = '1.2.35'
 
 class OkerrExc(Exception):
     pass
@@ -275,26 +275,42 @@ class OkerrProject:
         return False
 
     # OkerrProject.geturl
-    def geturl(self):
+    def geturl(self, ntries=10, delay=0.5):
 
         if self.direct:
             return self.url
 
         if self.need_update_url():
-            durl = urljoin(self.url,'/api/director/{}'.format(self.textid))
-            try:
-                r = requests.get(durl, timeout=5)
-            except requests.exceptions.RequestException as e:
-                self.log.error("ERROR! geturl connection error: {}".format(e))
-                self.project_url = None
-                self.url_received = 0
-                return None                        
-            if r.status_code != 200:
-                self.log.error("ERROR! status code: {} for dURL {}".format(r.status_code, durl))
-                return None
+            ntry = 0
 
-            self.log.debug("got url {} from director {}".format(r.text.rstrip(), durl))
-            self.project_url = r.text.rstrip()
-            self.url_received = time.time()
+            self.project_url = None
+            durl = urljoin(self.url, '/api/director/{}'.format(self.textid))
+
+            while self.project_url is None and ntry < ntries:
+
+                try:
+                    r = requests.get(durl, timeout=5)
+
+                except requests.exceptions.RequestException as e:
+
+                    self.log.error("ERROR! geturl connection error: {}".format(e))
+                    self.project_url = None
+                    self.url_received = 0
+
+                    time.sleep(delay)
+                    ntry += 1
+                    continue
+
+                if r.status_code != 200:
+                    self.log.error("ERROR! status code: {} for dURL {}".format(r.status_code, durl))
+
+                    time.sleep(delay)
+                    ntry += 1
+                    continue
+
+                self.log.debug("got url {} from director {}".format(r.text.rstrip(), durl))
+                self.project_url = r.text.rstrip()
+                self.url_received = time.time()
+
         self.log.debug("geturl: return {}".format(self.project_url))
         return self.project_url

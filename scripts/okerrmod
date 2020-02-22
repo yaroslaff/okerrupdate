@@ -346,11 +346,12 @@ def main():
     logging.basicConfig()
     log = logging.getLogger('okerrmod')
     log.propagate = False
+
     oulog = logging.getLogger('okerrupdate')
 
     # log.removeHandler(log.handlers[0])
     out = logging.StreamHandler(sys.stdout)
-    out.setFormatter(logging.Formatter('%(message)s'))
+    out.setFormatter(logging.Formatter('%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S'))
     out.setLevel(logging.DEBUG)
     log.addHandler(out)
 
