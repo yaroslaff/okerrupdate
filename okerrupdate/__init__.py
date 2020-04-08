@@ -7,7 +7,7 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.35'
+__version__ = '1.2.36'
 
 class OkerrExc(Exception):
     pass
@@ -162,7 +162,6 @@ class OkerrProject:
         url = self.geturl()
 
         if not url:
-            self.log.error("cannot update, url not given!")
             raise OkerrExc('cannot update, url not given')
             return
 
