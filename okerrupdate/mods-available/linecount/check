@@ -1,0 +1,56 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import re
+import glob
+import time
+import fnmatch
+
+
+def should_skip(path, skip):
+    for g in skip.split(' '):
+        if fnmatch.fnmatch(path, g):
+            return True
+    return False
+
+
+def wcl(path):
+    with open(path, "r") as f:
+        for i, l in enumerate(f):
+            pass
+        return i+1
+
+
+# read parameters
+prefix = os.getenv('PREFIX')
+prefix2 = os.getenv('PREFIX2', '')
+pathlist = os.getenv('PATHLIST', '/var/log/*')
+skip = os.getenv('SKIP', '')
+recursive = bool(int(os.getenv('RECURSIVE', '1')))
+
+nfiles = 0
+filename = None
+
+n_ok = 0
+
+status = 'OK'
+details = ''
+
+for path in pathlist.split(' '):
+    for curpath in glob.glob(path, recursive=recursive):
+
+        if not os.path.isfile(curpath):
+            continue
+        if should_skip(curpath, skip):
+            continue
+
+        basename = os.path.basename(curpath)
+        lines = wcl(curpath)
+
+        print("NAME: {}{}{}".format(prefix, prefix2, basename))
+        print("TAGS: {}".format(basename))
+        print("METHOD: numerical|minlim=0")
+        print("DETAILS: {}".format("{} lines".format(lines)))
+        print("STATUS: {}".format(lines))
+        print()

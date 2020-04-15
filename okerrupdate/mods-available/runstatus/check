@@ -5,32 +5,39 @@ import sys
 import shlex
 import subprocess
 
-VARSUFFIX='_RUN'
+VARSUFFIX_LIST=['_RUN', '_OK']
 
 # read parameters
 prefix = os.getenv('PREFIX')
 
-for k, v in os.environ.items():
-    if not k.endswith(VARSUFFIX):
-        continue
-    name = k[:-len(VARSUFFIX)]
-    details = ''
+for varsuffix in VARSUFFIX_LIST:
+    for k, v in os.environ.items():
+        if not k.endswith(varsuffix):
+            continue
+        name = k[:-len(varsuffix)]
+        details = ''
 
-    try:
-        r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except Exception as e:
-        code = -1
-        details = str(e)
-    else:
-        code = r.returncode
-        if r.stderr:
-            details = r.stderr.decode().strip().split('\n')[0]
+        try:
+            r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        except Exception as e:
+            code = -1
+            details = str(e)
         else:
-            details = r.stdout.decode().strip().split('\n')[0]
+            code = r.returncode
+            if r.stderr:
+                details = r.stderr.decode().strip().split('\n')[0]
+            else:
+                details = r.stdout.decode().strip().split('\n')[0]
 
-    print("NAME: {}{}".format(prefix, name))
-    print("TAGS: run")
-    print("DETAILS: {}".format(details))
-    print("METHOD: numerical|maxlim=0|minlim=0")
-    print("STATUS: {}".format(code))
-    print()
+        print("NAME: {}{}".format(prefix, name))
+        print("TAGS: run")
+        print("DETAILS: {}".format(details))
+
+        if varsuffix == '_OK':
+            print("METHOD: heartbeat")
+            print("STATUS: {}".format("OK" if code == 0 else "ERR"))
+            print()
+        elif varsuffix == '_RUN':
+            print("METHOD: numerical|maxlim=0|minlim=0")
+            print("STATUS: {}".format(code))
+            print()

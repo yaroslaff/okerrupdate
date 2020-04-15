@@ -3,14 +3,14 @@
 #
 
 #
-# This will make indicator prefix:true with status 0 (always OK unless failed) 
+# This will make heartbeat indicator prefix:true with status OK (always OK unless failed)
 #
-# true_RUN=/bin/true
+# true_OK=/bin/true
 
 #
-# This will make indicator prefix:false with status 1 (always ERR) 
+# This will make heartbeat indicator prefix:false with status ERR
 #
-# false_RUN=/bin/false
+# false_OK=/bin/false
 
 #
 # This will make indicator prefix:myapache which will be OK if apache2 is running
