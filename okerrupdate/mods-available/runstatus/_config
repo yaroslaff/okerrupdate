@@ -17,10 +17,10 @@
 #
 apache_RUN="systemctl is-active --quiet apache2"
 
-# nonempty_RUN="test -s /etc/passwd"
+# nonempty_OK="test -s /etc/passwd"
 
 # after command: touch /tmp/empty
-# empty_RUN="test ! -s /tmp/empty"
+# empty_OK="test ! -s /tmp/empty"
 
 # if URL is available
 # google_RUN = curl --silent --head --fail --output /dev/null http://google.com/
