@@ -25,7 +25,6 @@ def wcl(path):
 
 # read parameters
 prefix = os.getenv('PREFIX')
-prefix2 = os.getenv('PREFIX2', '')
 pathlist = os.getenv('PATHLIST', '/var/log/*')
 skip = os.getenv('SKIP', '')
 recursive = bool(int(os.getenv('RECURSIVE', '1')))
@@ -49,7 +48,7 @@ for path in pathlist.split(' '):
         basename = os.path.basename(curpath)
         lines = wcl(curpath)
 
-        print("NAME: {}{}{}".format(prefix, prefix2, basename))
+        print("NAME: {}{}".format(prefix, basename))
         print("TAGS: {}".format(basename))
         print("METHOD: numerical|minlim=0")
         print("DETAILS: {}".format("{} lines".format(lines)))
