@@ -435,21 +435,23 @@ OKERR_MOD_AVAIL=
             m = Module(mod_path)
             m.enable()
 
+        if os.path.exists('/etc/cron.d/'):
+            offset = random.randrange(20)
+            tokens = {
+                ('%PYTHON%', sys.executable),
+                ('%OKERRMOD%', os.path.realpath(__file__)),
+                ('%MINUTES%', ','.join(map(str, [offset, offset+20, offset+40])))
+            }
 
-        offset = random.randrange(20)
-        tokens = {
-            ('%PYTHON%', sys.executable),
-            ('%OKERRMOD%', os.path.realpath(__file__)),
-            ('%MINUTES%', ','.join(map(str, [offset, offset+20, offset+40])))
-        }
+            crondata = read_template(os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod'), tokens)
 
-        crondata = read_template(os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod'), tokens)
-
-        cronjob = '/etc/cron.d/okerrmod'
-        if not os.path.exists(cronjob):
-            with open(cronjob, 'w') as fh:
-                print("Generate", cronjob)
-                fh.write(crondata)
+            cronjob = '/etc/cron.d/okerrmod'
+            if not os.path.exists(cronjob):
+                with open(cronjob, 'w') as fh:
+                    print("Generate", cronjob)
+                    fh.write(crondata)
+        else:
+            print("Did not created /etc/cron.d/okerrmod because no /etc/cron.d/")
 
         exit()
 
