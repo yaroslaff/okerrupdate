@@ -7,10 +7,15 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.41'
+__version__ = '1.2.42'
+
 
 class OkerrExc(Exception):
-    pass
+    def __init__(self, msg, kind=None, requests_response=None, requests_exception=None):
+        super().__init__(msg)
+        self.requests_response = requests_response
+        self.requests_exception = requests_exception
+
 
 class OkerrIndicator:
     def __init__(self, name, project, secret=None, method=None, policy=None, desc=None, tags=None, error=None, origkeypath=None, keypath=None):
@@ -33,6 +38,7 @@ class OkerrIndicator:
         self.throttle = 300
         self.last_status = None
 
+    # OkerrIndicator.update
     def update(self, status, details=None):
         def skip(self, status):
             if time.time() < self.lastupdate + self.throttle:
@@ -48,10 +54,11 @@ class OkerrIndicator:
         
         if skip(self, status):
             self.project.log.debug('skip update {}@{}'.format(self.name, self.project.textid))
-            return True # success if skipped
+            return True  # success if skipped
         
-        success = self.project.update(self.name, status = status, details = details, secret = self.secret, method = self.method, 
-            policy = self.policy, tags = self.tags, error = self.error, desc=self.desc, origkeypath = self.origkeypath, keypath = self.keypath)
+        success = self.project.update(self.name, status=status, details=details, secret=self.secret,
+                                      method=self.method, policy=self.policy, tags=self.tags, error=self.error,
+                                      desc=self.desc, origkeypath=self.origkeypath, keypath=self.keypath)
         self.lastupdate = time.time()
         self.last_status = status
         
@@ -137,6 +144,7 @@ class OkerrProject:
             tags = tags, error = error, origkeypath = origkeypath, keypath = keypath)
         return i
 
+    # okerrproject.update
     def update(self, name, status, details=None, secret=None, desc=None,
         method=None, policy='Default', tags=None, error=None, origkeypath=None, keypath=None):
         if self.dry_run:
@@ -163,7 +171,6 @@ class OkerrProject:
 
         if not url:
             raise OkerrExc('cannot update, url not given')
-            return
 
         if not url.endswith('/'):
             url += '/'
@@ -182,7 +189,7 @@ class OkerrProject:
 
         payload={
             'textid': textid, 
-            'name':name, 
+            'name': name,
             'status': str(status), 
             'details': details, 
             'secret': secret, 
@@ -209,14 +216,13 @@ class OkerrProject:
         
         preview = str(status)
         
-        preview = re.sub('[\r\n]'," ", preview)
+        preview = re.sub('[\r\n]', " ", preview)
         
-        if len(str(preview))>40:
+        if len(str(preview)) > 40:
             preview = str(preview)[:38]+".."
         else:
             preview = str(preview)
-            
-        
+
         stop = False
         success = False
         
@@ -225,18 +231,20 @@ class OkerrProject:
             if r.status_code == 200:
                 stop = True
                 success = True
-                self.log.info('okerr updated ({} {}) {} = {}'.\
-                    format(r.status_code, r.reason, fullname, preview))
+                self.log.info('okerr updated ({} {}) {} = {}'.
+                              format(r.status_code, r.reason, fullname, preview))
             else:
-                self.log.error('okerr update error ({} ({}): {}) {}={} {}'.\
-                    format(r.status_code,r.reason, r.text, fullname,preview,secretlog))
-        
+                raise OkerrExc('okerr exception http code {} {}'.
+                               format(r.status_code, r.reason),
+                               requests_response=r)
+
             self.log.debug('Request to URL {}:'.format(r.request.url))
             self.log.debug(r.request.body)
             
         except requests.exceptions.RequestException as e:
-            raise OkerrExc('okerr exception {} {}={} {}'.\
-                format(e,fullname,status,secretlog))
+            raise OkerrExc('okerr requests exception {}'.
+                           format(e),
+                           requests_exception=e)
 
         if r:
             self.log.debug(r.content)
