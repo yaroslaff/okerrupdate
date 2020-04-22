@@ -115,5 +115,11 @@ i = op.indicator('temp', method='numerical|maxlim=37', policy='Daily')
 i.update('36.6')
 ```
 
-## WIKI
+## Wiki 
 More info in [okerrupdate wiki](https://gitlab.com/yaroslaff/okerrupdate/-/wikis/home).
+
+## Other okerr resources
+- [Okerr main website](https://okerr.com/)
+- [Okerr-server source code repository](gitlab.com/yaroslaff/okerr-dev/) and [okerr server wiki doc](https://gitlab.com/yaroslaff/okerr-dev/wikis/)
+- [Okerr client (okerrupdate) repositoty](https://gitlab.com/yaroslaff/okerrupdate) and [okerrupdate wiki doc](https://gitlab.com/yaroslaff/okerrupdate/wikis/)
+- [Okerrbench network server benchmark](https://gitlab.com/yaroslaff/okerrbench)

@@ -28,6 +28,7 @@ prefix = os.getenv('PREFIX')
 pathlist = os.getenv('PATHLIST', '/var/log/*')
 skip = os.getenv('SKIP', '')
 recursive = bool(int(os.getenv('RECURSIVE', '1')))
+missing_ok = os.getenv('MISSING_OK', '')
 
 nfiles = 0
 filename = None
@@ -36,6 +37,8 @@ n_ok = 0
 
 status = 'OK'
 details = ''
+
+reported = list()
 
 for path in pathlist.split(' '):
     for curpath in glob.glob(path, recursive=recursive):
@@ -54,3 +57,19 @@ for path in pathlist.split(' '):
         print("DETAILS: {}".format("{} lines".format(lines)))
         print("STATUS: {}".format(lines))
         print()
+        reported.append(curpath)
+
+for path in missing_ok.split(' '):
+    if path and not path in reported:
+        # simulate zero
+
+        basename = os.path.basename(path)
+        lines = 0
+
+        print("NAME: {}{}".format(prefix, basename))
+        print("TAGS: {}".format(basename))
+        print("METHOD: numerical|minlim=0")
+        print("DETAILS: {}".format("simulated 0 lines (file does not exists)"))
+        print("STATUS: {}".format(lines))
+        print()
+        reported.append(path)

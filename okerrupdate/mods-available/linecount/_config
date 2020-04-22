@@ -10,6 +10,10 @@ PATHLIST=/var/log/apache2/error.log /var/log/mysql.err
 # recursive? if 1 and path ends with '**', it will match any file 
 RECURSIVE=1
 
+# Space-separated list of files.
+# If file from this list is missing, it will be reported anyway as if it has 0 lines.
+MISSING_OK=
+
 # glob to skip these files (empty: do not skip anything)
 # SKIP=/var/log/journal
 SKIP=
