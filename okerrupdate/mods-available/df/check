@@ -42,9 +42,9 @@ for p in psutil.disk_partitions():
     used = kmgt(u.used)
     free = kmgt(u.free)
 
-    data="""
+    data = """
 NAME: {prefix}df-{mount}
-TAGS: la
+TAGS: df
 METHOD: numerical|maxlim={maxlim}
 DETAILS: {perc:.2f}%, {used}/{total} used, {free} free
 STATUS: {perc:.2f}

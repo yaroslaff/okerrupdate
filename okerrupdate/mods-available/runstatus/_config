@@ -15,7 +15,7 @@
 #
 # This will make indicator prefix:myapache which will be OK if apache2 is running
 #
-apache_RUN="systemctl is-active --quiet apache2"
+# apache_OK="systemctl is-active --quiet apache2"
 
 # nonempty_OK="test -s /etc/passwd"
 
@@ -23,6 +23,7 @@ apache_RUN="systemctl is-active --quiet apache2"
 # empty_OK="test ! -s /tmp/empty"
 
 # if URL is available
+# _RUN makes numerical indicator, not heartbeat. Maybe you will need more flexibility
 # google_RUN = curl --silent --head --fail --output /dev/null http://google.com/
 
 ### COMMON SETTINGS

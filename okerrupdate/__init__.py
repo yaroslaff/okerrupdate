@@ -7,7 +7,7 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.43'
+__version__ = '1.2.44'
 
 
 class OkerrExc(Exception):
