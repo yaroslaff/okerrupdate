@@ -371,7 +371,6 @@ def main():
         src_link = os.path.join(def_mods_enabled, src)
         src_target = os.path.realpath(src_link)
         clone_link = os.path.join(def_mods_enabled, dst)
-        print(clone_link)
         os.symlink(src_target, clone_link)
 
         # copy config
