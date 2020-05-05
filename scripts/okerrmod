@@ -337,6 +337,7 @@ def main():
     g.add_argument('--disable', default=False, action='store_true', help='Disable module')
     g.add_argument('--list', default=False, action='store_true', help='List modules')
     g.add_argument('--init', default=False, action='store_true', help='Init /etc/okerr directory')
+    g.add_argument('--clone', nargs=2, metavar=('CHECK', 'NEW_NAME'), help='Clone check with other name')
 
     args = parser.parse_args()
 
@@ -361,6 +362,27 @@ def main():
         log.setLevel(logging.WARNING)
     else:
         log.setLevel(logging.INFO)
+
+    if args.clone:
+        src = args.clone[0]
+        dst = args.clone[1]
+
+        # clone symlink
+        src_link = os.path.join(def_mods_enabled, src)
+        src_target = os.path.realpath(src_link)
+        clone_link = os.path.join(def_mods_enabled, dst)
+        print(clone_link)
+        os.symlink(src_target, clone_link)
+
+        # copy config
+        src_config = os.path.join(def_env, src)
+        dst_config = os.path.join(def_env, dst)
+        shutil.copy(src_config, dst_config)
+
+        print("Cloned {} as check {}".format(src_target, dst))
+        print("Config: {}".format(dst_config))
+
+        sys.exit()
 
     if args.list:
         listed = list()
