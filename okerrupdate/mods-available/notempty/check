@@ -27,10 +27,10 @@ def timesuffix2sec(timesuffix):
 # read parameters
 prefix = os.getenv('PREFIX')
 basename = os.getenv('BASENAME')
-pathlist = os.getenv('PATHLIST','/var/log/*')
-skip = os.getenv('SKIP','')
+pathlist = os.getenv('PATHLIST', '/var/log/*')
+skip = os.getenv('SKIP', '')
 maxage = timesuffix2sec(os.getenv('MAXAGE', '10m'))
-recursive = bool(int(os.getenv('RECURSIVE','1')))
+recursive = bool(int(os.getenv('RECURSIVE', '1')))
 
 nfiles = 0
 filename = None
@@ -70,7 +70,7 @@ else:
     details = '{} files checked'.format(n_ok)
 
 print("NAME: {}{}".format(prefix, basename))
-print("TAGS: {}".format(basename))
+print("TAGS: empty")
 print("METHOD: heartbeat")
 print("DETAILS: {}".format(details))
 print("STATUS: {}".format(status))

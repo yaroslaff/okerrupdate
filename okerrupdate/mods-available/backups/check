@@ -59,8 +59,6 @@ for path in pathlist.split(' '):
 
         tpl = re.sub(date, datesub, os.path.basename(curpath))
         sz = os.stat(curpath).st_size
-        print("TPL: {}".format(tpl))
-
         print("NAME: {}{}".format(prefix, tpl))
         print("TAGS: backups")
         print("DETAILS: {}: {}".format(os.path.basename(curpath), kmgt(sz)))

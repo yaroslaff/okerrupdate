@@ -52,7 +52,7 @@ for path in pathlist.split(' '):
         lines = wcl(curpath)
 
         print("NAME: {}{}".format(prefix, basename))
-        print("TAGS: {}".format(basename))
+        print("TAGS: linecount")
         print("METHOD: numerical|minlim=0")
         print("DETAILS: {}".format("{} lines".format(lines)))
         print("STATUS: {}".format(lines))
@@ -67,7 +67,7 @@ for path in missing_ok.split(' '):
         lines = 0
 
         print("NAME: {}{}".format(prefix, basename))
-        print("TAGS: {}".format(basename))
+        print("TAGS: linecount")
         print("METHOD: numerical|minlim=0")
         print("DETAILS: {}".format("simulated 0 lines (file does not exists)"))
         print("STATUS: {}".format(lines))

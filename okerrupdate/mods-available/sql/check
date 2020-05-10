@@ -26,7 +26,7 @@ try:
 
 except Exception as e:
     print("NAME: {}{}".format(prefix, basename))
-    print("TAGS: {}".format(basename))
+    print("TAGS: sql")
     print("METHOD: numerical")
     print("DETAILS: {}".format(str(e)))
     print("STATUS: {}".format(-1))
@@ -48,7 +48,7 @@ for k, v in os.environ.items():
         details = "{}: {}".format(query, value)
 
         print("NAME: {}{}".format(prefix, name))
-        print("TAGS: {}".format(basename))
+        print("TAGS: sql")
         print("METHOD: numerical")
         print("DETAILS: {}".format(details))
         print("STATUS: {}".format(value))
@@ -56,7 +56,7 @@ for k, v in os.environ.items():
 
     except Exception as e:
         print("NAME: {}{}".format(prefix, basename))
-        print("TAGS: {}".format(basename))
+        print("TAGS: sql")
         print("METHOD: numerical")
         print("DETAILS: {}".format(str(e)))
         print("STATUS: {}".format(-1))

@@ -72,7 +72,7 @@ else:
     details = "{} files checked".format(n_ok)
 
 print("NAME: {}{}".format(prefix, basename))
-print("TAGS: {}".format(basename))
+print("TAGS: empty")
 print("METHOD: heartbeat")
 print("DETAILS: {}".format(details))
 print("STATUS: {}".format(status))
