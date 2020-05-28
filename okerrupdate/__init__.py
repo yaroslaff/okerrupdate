@@ -7,7 +7,7 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.47'
+__version__ = '1.2.48'
 
 
 class OkerrExc(Exception):
@@ -22,8 +22,10 @@ class OkerrIndicator:
     
         if not isinstance(project, OkerrProject):
             project = OkerrProject(project)
-            
-        self.name = name
+
+        # name sanitization
+        self.name = self.fix_name(name)
+
         self.project = project
         self.secret = secret
         self.method = method
@@ -37,6 +39,20 @@ class OkerrIndicator:
         self.lastupdate = 0
         self.throttle = 300
         self.last_status = None
+
+    # OkerrIndicator.fix_name
+    def fix_name(self, name):
+        bad_chars = "<>%\\@"
+        replacement = '_' * len(bad_chars)
+        trans_table = str.maketrans(bad_chars, replacement)
+        good_name = name.translate(trans_table)
+        good_name = good_name.replace("//", "__")  # Duplicate forward slash not allowed
+
+        if good_name.startswith('/'):
+            good_name = '_' + good_name[1:]
+
+        return good_name
+
 
     # OkerrIndicator.update
     def update(self, status, details=None):
