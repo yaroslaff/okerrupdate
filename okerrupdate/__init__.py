@@ -7,7 +7,7 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.48'
+__version__ = '1.2.49'
 
 
 class OkerrExc(Exception):
@@ -250,8 +250,8 @@ class OkerrProject:
                 self.log.info('okerr updated ({} {}) {} = {}'.
                               format(r.status_code, r.reason, fullname, preview))
             else:
-                raise OkerrExc('okerr exception http code {} {}'.
-                               format(r.status_code, r.reason),
+                raise OkerrExc('okerr exception http code {} ({}) {}'.
+                               format(r.status_code, r.reason, r.text),
                                requests_response=r)
 
             self.log.debug('Request to URL {}:'.format(r.request.url))

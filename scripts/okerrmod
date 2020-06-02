@@ -196,7 +196,10 @@ class Module:
             if u.STATUS is not None:
                 i = project.indicator(u.NAME, secret=secret,
                                       method=u.METHOD, policy=u.POLICY, tags=u.TAGS.split(' '))
-                i.update(u.STATUS, details=u.DETAILS)
+                try:
+                    i.update(u.STATUS, details=u.DETAILS)
+                except okerrupdate.OkerrExc as e:
+                    print(e)
 
     def enabled(self):
         for basename in os.listdir(self.path_enabled):
@@ -338,8 +341,13 @@ def main():
     g.add_argument('--list', default=False, action='store_true', help='List modules')
     g.add_argument('--init', default=False, action='store_true', help='Init /etc/okerr directory')
     g.add_argument('--clone', nargs=2, metavar=('CHECK', 'NEW_NAME'), help='Clone check with other name')
+    g.add_argument('--version', default=False, action='store_true', help='Show only package version')
 
     args = parser.parse_args()
+
+    if args.version:
+        print(okerrupdate.__version__)
+        return
 
     if args.avail:
         def_mods_available = [args.avail] + def_mods_available
