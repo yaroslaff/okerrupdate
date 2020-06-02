@@ -16,12 +16,7 @@ def should_skip(path, skip):
 
 
 def wcl(path):
-    lines = 0
-    with open(path, "r") as f:
-        for _ in f:
-            lines += 1
-    return lines
-
+    return sum(1 for line in open(path, 'rb'))
 
 # read parameters
 prefix = os.getenv('PREFIX')
