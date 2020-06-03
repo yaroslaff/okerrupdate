@@ -39,7 +39,7 @@ if args.verbose:
     p.verbose()
 
 try:
-    i = p.indicator(name, secret = args.secret, method = args.method, desc=args.desc, policy = args.policy )
-    i.update(args.value, details = args.details)
+    i = p.indicator(name, secret=args.secret, method=args.method, desc=args.desc, policy=args.policy)
+    i.update(args.value, details=args.details)
 except OkerrExc as e:
     print(e)

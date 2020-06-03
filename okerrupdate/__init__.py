@@ -7,14 +7,16 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.50'
+__version__ = '1.2.51'
 
 
 class OkerrExc(Exception):
-    def __init__(self, msg, kind=None, requests_response=None, requests_exception=None):
+    def __init__(self, msg, code=None, requests_response=None, requests_exception=None):
         super().__init__(msg)
         self.requests_response = requests_response
         self.requests_exception = requests_exception
+        self.msg = msg
+        self.code = code
 
 
 class OkerrIndicator:
@@ -250,9 +252,11 @@ class OkerrProject:
                 self.log.info('okerr updated ({} {}) {} = {}'.
                               format(r.status_code, r.reason, fullname, preview))
             else:
+                m = re.search('^ERROR:([^ ]+)', r.text)
+                code = m.group(1) if m else None
                 raise OkerrExc('okerr exception http code {} ({}) {}'.
                                format(r.status_code, r.reason, r.text),
-                               requests_response=r)
+                               requests_response=r, code=code)
 
             self.log.debug('Request to URL {}:'.format(r.request.url))
             self.log.debug(r.request.body)
