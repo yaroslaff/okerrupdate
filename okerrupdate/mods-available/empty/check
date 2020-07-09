@@ -5,7 +5,7 @@ import sys
 import re
 import glob
 import time
-
+import fnmatch
 
 def should_skip(path, skip):
     for g in skip.split(' '):
