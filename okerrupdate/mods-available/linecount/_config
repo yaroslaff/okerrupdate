@@ -1,5 +1,5 @@
 #
-# Env configurational file for 'empty' check
+# Env configurational file for 'linecount' check
 #
 
 # PREFIX2=logs:
@@ -15,5 +15,5 @@ RECURSIVE=1
 MISSING_OK=
 
 # glob to skip these files (empty: do not skip anything)
-# SKIP=/var/log/journal
+# SKIP=/var/log/journal /var/log/mylog
 SKIP=

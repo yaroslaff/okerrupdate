@@ -10,4 +10,8 @@ RECURSIVE=1
 
 # regex to skip these files (empty: do not skip anything)
 # SKIP=/var/log/journal
+# OBSOLETE, do not use
 SKIP=
+
+# space-separated glob to skip files
+SKIP_GLOB=

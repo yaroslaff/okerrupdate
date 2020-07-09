@@ -6,6 +6,13 @@ import re
 import glob
 import time
 
+
+def should_skip(path, skip):
+    for g in skip.split(' '):
+        if fnmatch.fnmatch(path, g):
+            return True
+    return False
+
 def timesuffix2sec(timesuffix):
     suf = {'s': 1, 'm': 60, 'h': 3600, 'd': 86400}
 
@@ -27,10 +34,11 @@ def timesuffix2sec(timesuffix):
 # read parameters
 prefix = os.getenv('PREFIX')
 basename = os.getenv('BASENAME')
-pathlist = os.getenv('PATHLIST','/var/log/*')
-skip = os.getenv('SKIP','')
+pathlist = os.getenv('PATHLIST', '/var/log/*')
+skip = os.getenv('SKIP', '')
+skip_glob = os.getenv('SKIP_GLOB', '')
 maxage = timesuffix2sec(os.getenv('MAXAGE', '10m'))
-recursive = bool(int(os.getenv('RECURSIVE','1')))
+recursive = bool(int(os.getenv('RECURSIVE', '1')))
 
 nfiles = 0
 filename = None
@@ -46,11 +54,14 @@ for path in pathlist.split(' '):
             continue
         if skip and re.search(skip, curpath):
             continue
+        if should_skip(curpath, skip_glob):
+            continue
+
         stat = os.stat(curpath)
         sz = stat.st_size
         age = time.time() - stat.st_mtime
 
-        if age<maxage:
+        if age < maxage:
             continue
 
         if not sz:
