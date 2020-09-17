@@ -7,6 +7,9 @@ IGNORE_DEVICE=^/dev/loop
 # Ignore partitions where devices matches regex 
 IGNORE_MOUNT=^/media/|^/tmp/
 
+# Ignore partitions where fstype matches regex
+IGNORE_FSTYPE=devpts|tmpfs|sysfs|proc
+
 # Set ALL=1 to process all partitions (including logical)
 ALL=0
 
