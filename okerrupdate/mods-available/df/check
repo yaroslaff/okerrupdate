@@ -25,9 +25,10 @@ prefix = os.getenv('PREFIX')
 maxlim = int(os.getenv('MAXLIM','90'))
 ignore_device = os.getenv('IGNORE_DEVICE','^/dev/loop')
 ignore_mount = os.getenv('IGNORE_MOUNT','')  # '^/media/|^/snap/'
+all_partitions = int(os.getenv('ALL','0'))
 
-for p in psutil.disk_partitions():
-    # print("?", p)
+for p in psutil.disk_partitions(all=bool(all_partitions)):
+    print("# ", p)
     if ignore_device:
         if re.search(ignore_device, p.device):
             #print("ignore device", ignore_device)

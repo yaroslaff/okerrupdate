@@ -4,3 +4,5 @@ okerrupdate.egg-info/
 dist/
 build/
 .idea
+.vscode.code-workspace
+
