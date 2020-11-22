@@ -6,6 +6,9 @@ import subprocess
 import glob
 import fnmatch
 
+class NoSize(Exception):
+    pass
+
 def kmgt(sz, frac=1):
     t = {
         'K': pow(1024, 1),
@@ -51,6 +54,9 @@ def sys_du(path, skip):
         sys.stderr.write(r.stderr)
         return -1
 
+    if not r.stdout:
+        raise NoSize
+
     sz = int(r.stdout.decode().split('\t')[0])
     return sz
 
@@ -85,7 +91,11 @@ for path in pathlist.split(' '):
             continue
         print('# count {}'.format(curpath))
 
-        sz = du(curpath, skip)
+        try:
+            sz = du(curpath, skip)
+        except NoSize as e:
+            print('# Skip {} (NoSize)'.format(curpath))
+            continue
 
         print("NAME: {}{}".format(prefix, curpath if fullpath else os.path.basename(curpath)))
         print("TAGS: dirsize")
