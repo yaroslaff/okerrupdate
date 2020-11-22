@@ -10,7 +10,7 @@ def read(fname):
 setup(name='okerrupdate',
       version=okerrupdate.__version__,
       description='client-side okerr module and utilities',
-      url='https://gitlab.com/yaroslaff/okerrupdate',
+      url='https://github.com/yaroslaff/okerrupdate',
       author='Yaroslav Polyakov',
       author_email='yaroslaff@gmail.com',
       license='MIT',
