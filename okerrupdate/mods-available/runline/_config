@@ -13,6 +13,19 @@ apache_CASE=1
 # return this line (line 0 by default)
 apache_LINE=0
 
+
+#
+# Other, simpler examples
+#
+
+### used memory in megabytes
+#usedmem_RUN=/bin/sh -c 'free --mega|grep Mem:|tr -s " "|cut -f 3 -d " "'
+
+### CPU temperature
+#cputemp_RUN=cat /sys/class/thermal/thermal_zone0/temp
+
+
+
 ### COMMON SETTINGS
 
 # PREFIX2=run:
