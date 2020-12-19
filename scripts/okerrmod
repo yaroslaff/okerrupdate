@@ -21,7 +21,13 @@ def_mods_available = [
 def_env = '/etc/okerr/mods-env/'
 log = None
 
-class NoModule(Exception):
+class OkerrmodException(Exception):
+    pass
+
+class NoModule(OkerrmodException):
+    pass
+
+class NotConfigured(OkerrmodException):
     pass
 
 def decode_escaped(s):
@@ -139,11 +145,16 @@ class Module:
 
         :param modspec: name of module or path to module
         :return: path to module
+
+        may raise NotConfigured
         """
+        if not os.path.isdir(def_mods_enabled):
+            raise NotConfigured(f'Dir {def_mods_enabled} not exists. Maybe forgot to run okerrmod --init ?')
+
         for path in list_dirs([def_mods_enabled, def_mods_available]):
             if os.path.basename(path) == modspec:
                 return path
-
+            
         if os.path.isdir(modspec):
             path = modspec
             return path
@@ -405,10 +416,11 @@ def main():
 
     if args.enable:
         for modspec in args.modlist:
-            modpath = Module.find_module(modspec)
             try:
+                modpath = Module.find_module(modspec)
+                print("modpath:", modpath)
                 m = Module(modpath)
-            except (ValueError, NoModule) as e:
+            except (ValueError, OkerrmodException) as e:
                 log.error(e)
             else:
                 m.enable()

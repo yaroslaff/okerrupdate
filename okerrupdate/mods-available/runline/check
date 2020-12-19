@@ -20,6 +20,14 @@ for k, v in os.environ.items():
     grep = os.getenv('{}_GREP'.format(name), '')
     case = int(os.getenv('{}_CASE'.format(name), '1'))
 
+    cm = os.getenv(f'{name}_CM', 'string')
+    if cm == 'string':
+        def_cmargs = 'options=reinit dynamic'
+    else:
+        def_cmargs = ''
+
+    cmargs = os.getenv(f'{name}_CMARGS',def_cmargs)
+
     if case == 0:
         grep_opts = re.IGNORECASE
     else:
@@ -40,9 +48,9 @@ for k, v in os.environ.items():
         except IndexError:
             line = ''
 
-    print("NAME: {}{}".format(prefix, name))
-    print("TAGS: run")
-    print("DETAILS: {}".format(line))
-    print("METHOD: string|options=reinit dynamic")
-    print("STATUS: {}".format(line))
+    print(f'NAME: {prefix}{name}')
+    print(f'TAGS: run')
+    print(f'DETAILS: {line}')
+    print(f'METHOD: {cm}|{cmargs}')
+    print(f'STATUS: {line}')
     print()
