@@ -18,8 +18,13 @@ apache_LINE=0
 # Other, simpler examples
 #
 
-### used memory in megabytes
-#usedmem_RUN=/bin/sh -c 'free --mega|grep Mem:|tr -s " "|cut -f 3 -d " "'
+### system: used memory in megabytes
+# usedmem_RUN=/bin/sh -c 'free --mega|grep Mem:|tr -s " "|cut -f 3 -d " "'
+
+### service: used memory in megabytes
+# mysql_used_RUN=/bin/sh -c 'systemctl status mariadb | grep Memory| tr -cd "[:digit:]."'
+
+
 
 ### CPU temperature
 #cputemp_RUN=cat /sys/class/thermal/thermal_zone0/temp
