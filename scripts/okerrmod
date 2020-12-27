@@ -212,7 +212,7 @@ class Module:
                     i.update(u.STATUS, details=u.DETAILS)
                 except okerrupdate.OkerrExc as e:
                     log.error('Failed to update {name} = {status} exception: {exc}'
-                        .format(name = u.NAME, status = u.STATUS, e))
+                        .format(name = u.NAME, status = u.STATUS, exc=e))
 
     def enabled(self):
         for basename in os.listdir(self.path_enabled):
