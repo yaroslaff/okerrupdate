@@ -7,7 +7,12 @@ import sys
 import os
 from urllib.parse import urljoin
 
-__version__ = '1.2.63'
+# Needed for retries
+from requests.packages.urllib3.util.retry import Retry
+from requests.adapters import HTTPAdapter
+import urllib3
+
+__version__ = '1.2.64'
 
 
 class OkerrExc(Exception):
@@ -102,13 +107,32 @@ class OkerrProject:
         self.direct = direct if isinstance(direct, bool) else bool(int(os.getenv('OKERR_DIRECT','0')))
         self.x = dict()
         self.url = url or os.getenv('OKERR_URL', '') or 'https://cp.okerr.com/'
-
+        
+        
+        self.timeout = 10
+        self.retries = 5
+        self.backoff = 2
+        self.http = None
+        logging.getLogger("urllib3").setLevel(logging.ERROR)
+        self.make_http()
 
         self.make_logger()
 
         if self.textid is None or self.secret is None:
             # try read okerrclient.conf
             self.read_config(config)
+
+    def make_http(self):
+        retry_strategy = Retry(
+            total=self.retries,
+            backoff_factor=self.backoff,
+            status_forcelist=[429, 500, 502, 503, 504],
+            method_whitelist=["HEAD", "GET", "POST", "OPTIONS"]
+        )
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        self.http = requests.Session()
+        self.http.mount("https://", adapter)
+        self.http.mount("http://", adapter)
 
     def make_logger(self):
         logging.basicConfig()
@@ -245,7 +269,7 @@ class OkerrProject:
         success = False
         
         try:
-            r = requests.post(url, data=payload, timeout=5)
+            r = self.http.post(url, data=payload, timeout=self.timeout)
             if r.status_code == 200:
                 stop = True
                 success = True
@@ -313,31 +337,11 @@ class OkerrProject:
             self.project_url = None
             durl = urljoin(self.url, '/api/director/{}'.format(self.textid))
 
-            while self.project_url is None and ntry < ntries:
+            r = self.http.get(durl, timeout=self.timeout)
 
-                try:
-                    r = requests.get(durl, timeout=5)
-
-                except requests.exceptions.RequestException as e:
-
-                    self.log.error("ERROR! geturl connection error: {}".format(e))
-                    self.project_url = None
-                    self.url_received = 0
-
-                    time.sleep(delay)
-                    ntry += 1
-                    continue
-
-                if r.status_code != 200:
-                    self.log.error("ERROR! status code: {} for dURL {}".format(r.status_code, durl))
-
-                    time.sleep(delay)
-                    ntry += 1
-                    continue
-
-                self.log.debug("got url {} from director {}".format(r.text.rstrip(), durl))
-                self.project_url = r.text.rstrip()
-                self.url_received = time.time()
+            self.log.debug("got url {} from director {}".format(r.text.rstrip(), durl))
+            self.project_url = r.text.rstrip()
+            self.url_received = time.time()
 
         self.log.debug("geturl: return {}".format(self.project_url))
         return self.project_url
