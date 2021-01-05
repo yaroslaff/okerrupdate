@@ -10,7 +10,6 @@ from urllib.parse import urljoin
 # Needed for retries
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
-import urllib3
 
 __version__ = '1.2.64'
 
@@ -109,7 +108,7 @@ class OkerrProject:
         self.url = url or os.getenv('OKERR_URL', '') or 'https://cp.okerr.com/'
         
         
-        self.timeout = 10
+        self.timeout = 5
         self.retries = 5
         self.backoff = 2
         self.http = None
@@ -336,8 +335,12 @@ class OkerrProject:
 
             self.project_url = None
             durl = urljoin(self.url, '/api/director/{}'.format(self.textid))
-
-            r = self.http.get(durl, timeout=self.timeout)
+            try:
+                r = self.http.get(durl, timeout=self.timeout)
+            except requests.exceptions.RequestException as e:
+                self.log.error('Failed to get director URL from {url} (tries:{retries} timeout:{timeout}) exception: {e}'
+                    .format(url=durl, retries=self.retries, timeout=self.timeout, e=e))
+                return None
 
             self.log.debug("got url {} from director {}".format(r.text.rstrip(), durl))
             self.project_url = r.text.rstrip()
