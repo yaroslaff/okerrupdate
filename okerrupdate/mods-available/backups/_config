@@ -9,6 +9,9 @@ PATHLIST=/var/mybackups/*gz
 # Which backups (age) we report to server. Use seconds or use suffix d,h,m or s
 FRESH=1d
 
+# File will NOT be processed if it's age is smaller then COMPLETED (possible it's still creating/copying)  
+COMPLETED=1min
+
 # DATE format in your backup files (regex)
 # default matches backups like name-2019-12-31.tar.gz
 # indicator name will be name-DATE.tar.gz
