@@ -42,6 +42,7 @@ def timesuffix2sec(timesuffix):
 prefix = os.getenv('PREFIX')
 pathlist = os.getenv('PATHLIST','/var/mybackups/*')
 fresh = timesuffix2sec(os.getenv('FRESH','1d'))
+completed = timesuffix2sec(os.getenv('COMPLETED','1min'))
 date = os.getenv('DATEFMT','[0-9][0-9\-]{7,}')
 datesub = os.getenv('DATESUB','DATE')
 minlim = os.getenv('MINLIM','10k')
@@ -54,11 +55,15 @@ for path in pathlist.split(' '):
         if skip and re.search(skip, curpath):
             continue
 
+        if time.time() - os.stat(curpath).st_mtime < completed:
+            continue
+
         if time.time() - os.stat(curpath).st_mtime > fresh:
             continue
 
         tpl = re.sub(date, datesub, os.path.basename(curpath))
         sz = os.stat(curpath).st_size
+
         print("NAME: {}{}".format(prefix, tpl))
         print("TAGS: backups")
         print("DETAILS: {}: {}".format(os.path.basename(curpath), kmgt(sz)))
