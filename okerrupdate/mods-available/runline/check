@@ -51,6 +51,9 @@ for k, v in os.environ.items():
     print(f'NAME: {prefix}{name}')
     print(f'TAGS: run')
     print(f'DETAILS: {line}')
-    print(f'METHOD: {cm}|{cmargs}')
+    if cmargs:
+        print(f'METHOD: {cm}|{cmargs}')
+    else:
+        print(f'METHOD: {cm}')
     print(f'STATUS: {line}')
     print()

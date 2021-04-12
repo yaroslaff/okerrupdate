@@ -1,0 +1,17 @@
+#
+# Env configurational file for 'runtime' check
+#
+
+
+#
+# How long do we sleep?
+#
+sleep_TIME = /usr/bin/sleep 2
+
+
+### COMMON SETTINGS
+
+# PREFIX2=time:
+
+# Policy if not default
+POLICY=

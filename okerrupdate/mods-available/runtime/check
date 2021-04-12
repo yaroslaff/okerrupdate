@@ -1,0 +1,44 @@
+#!/usr/bin/python3
+
+import os
+import sys
+import shlex
+import subprocess
+import time
+
+
+# read parameters
+prefix = os.getenv('PREFIX')
+varsuffix = '_TIME'
+fraction = int(os.getenv('FRACTION', '4'))
+
+for k, v in os.environ.items():
+
+    if not k.endswith(varsuffix):
+        continue
+    name = k[:-len(varsuffix)]
+    details = ''
+
+    started = time.time()
+    try:
+        r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except Exception as e:
+        code = -1
+        details = str(e)
+    else:
+        if r.returncode == 0:
+            status = round(time.time() - started, fraction)
+        else:        
+            status = -1
+            if r.stderr:
+                details = 'exited with status {}, err: {}'.format(r.returncode, r.stderr.decode().strip().split('\n')[0])
+            else:
+                details = 'exited with status {}'.format(r.returncode)
+
+    print("NAME: {}{}".format(prefix, name))
+    print("TAGS: sleep")
+    print("DETAILS: {}".format(details))
+
+    print("METHOD: numerical|maxlim=10|minlim=0")
+    print("STATUS: {}".format(status))
+    print()
