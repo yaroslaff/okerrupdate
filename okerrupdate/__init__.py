@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-__version__ = '1.2.67'
+__version__ = '1.2.68'
 
 
 class OkerrExc(Exception):
