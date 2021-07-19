@@ -11,7 +11,22 @@ from urllib.parse import urljoin
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-__version__ = '1.2.68'
+__version__ = '1.2.71'
+
+
+def get_okerr_conf_dir():
+    cflist = [
+        '/usr/local/etc/okerr/',
+        '/etc/okerr/',
+        os.path.expanduser('~/okerr'),
+        os.path.expanduser('~/.okerr')
+    ]
+    for path in cflist:
+        conffile = os.path.join(path, 'okerrupdate')
+        if os.path.isdir(path) and os.path.isfile(conffile):
+            return path
+    
+    raise OkerrExc(msg=f'Misconfigured? Not found file "okerrupdate" in {cflist}')
 
 
 class OkerrExc(Exception):

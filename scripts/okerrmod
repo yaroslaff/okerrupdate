@@ -11,14 +11,16 @@ import glob
 import random
 from dotenv import load_dotenv
 
-def_mods_enabled = '/etc/okerr/mods-enabled/'
+okerr_conf_dir = okerrupdate.get_okerr_conf_dir()
+
+def_mods_enabled = os.path.join(okerr_conf_dir, 'mods-enabled')
 
 def_mods_available = [
-    '/etc/okerr/mods-available/',
+    os.path.join(okerr_conf_dir, 'mods-available'),
     os.path.join(os.path.dirname(okerrupdate.__file__), 'mods-available')
     ]
 
-def_env = '/etc/okerr/mods-env/'
+def_env = os.path.join(okerr_conf_dir, 'mods-env')
 log = None
 
 class OkerrmodException(Exception):
@@ -317,7 +319,7 @@ def main():
     global def_mods_available
 
     # main code
-    conf_file = '/etc/okerr/okerrupdate'
+    conf_file = os.path.join(okerr_conf_dir, 'okerrupdate')
     load_dotenv(dotenv_path=conf_file)
 
     def_prefix = os.getenv('PREFIX', socket.gethostname().split('.')[0]+':')

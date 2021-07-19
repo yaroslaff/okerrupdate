@@ -1,5 +1,5 @@
 # default URL
-URL=https://diagnostic.opendns.com/myip
+URL=https://ifconfig.me/ip
 
 # Alternate URLS
 # URL=https://ifconfig.me
