@@ -6,7 +6,6 @@ import okerrupdate
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-
 setup(name='okerrupdate',
       version=okerrupdate.__version__,
       description='client-side okerr module and utilities',

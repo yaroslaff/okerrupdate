@@ -11,7 +11,7 @@ import glob
 import random
 from dotenv import load_dotenv
 
-okerr_conf_dir = okerrupdate.get_okerr_conf_dir()
+okerr_conf_dir = okerrupdate.get_okerr_conf_dir(default='/etc/okerr')
 
 def_mods_enabled = os.path.join(okerr_conf_dir, 'mods-enabled')
 
