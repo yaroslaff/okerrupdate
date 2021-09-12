@@ -20,13 +20,13 @@ for k, v in os.environ.items():
     grep = os.getenv('{}_GREP'.format(name), '')
     case = int(os.getenv('{}_CASE'.format(name), '1'))
 
-    cm = os.getenv(f'{name}_CM', 'string')
+    cm = os.getenv('{name}_CM'.format(name=name), 'string')
     if cm == 'string':
         def_cmargs = 'options=reinit dynamic'
     else:
         def_cmargs = ''
 
-    cmargs = os.getenv(f'{name}_CMARGS',def_cmargs)
+    cmargs = os.getenv('{name}_CMARGS'.format(name=name),def_cmargs)
 
     if case == 0:
         grep_opts = re.IGNORECASE
@@ -48,12 +48,12 @@ for k, v in os.environ.items():
         except IndexError:
             line = ''
 
-    print(f'NAME: {prefix}{name}')
-    print(f'TAGS: run')
-    print(f'DETAILS: {line}')
+    print('NAME: {prefix}{name}'.format(prefix=prefix, name=name))
+    print('TAGS: run')
+    print('DETAILS: {line}'.format(line=line))
     if cmargs:
-        print(f'METHOD: {cm}|{cmargs}')
+        print('METHOD: {cm}|{cmargs}'.format(cm=cm, cmargs=cmargs))
     else:
-        print(f'METHOD: {cm}')
-    print(f'STATUS: {line}')
+        print('METHOD: {cm}'.format(cm=cm))
+    print('STATUS: {line}'.format(line=line))
     print()

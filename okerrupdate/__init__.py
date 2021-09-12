@@ -11,7 +11,7 @@ from urllib.parse import urljoin
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-__version__ = '1.2.72'
+__version__ = '1.2.73'
 
 
 def get_okerr_conf_dir(default=None):
@@ -27,7 +27,7 @@ def get_okerr_conf_dir(default=None):
             return path
     if default:
         return default
-    raise OkerrExc(msg=f'Misconfigured? Not found file "okerrupdate" in {cflist}')
+    raise OkerrExc(msg='Misconfigured? Not found file "okerrupdate" in {cflist}'.format(cflist=cflist))
 
 
 class OkerrExc(Exception):
