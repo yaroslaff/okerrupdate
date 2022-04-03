@@ -11,7 +11,9 @@ from urllib.parse import urljoin
 from requests.packages.urllib3.util.retry import Retry
 from requests.adapters import HTTPAdapter
 
-__version__ = '1.2.73'
+from dotenv import load_dotenv
+
+__version__ = '1.2.74'
 
 
 def get_okerr_conf_dir(default=None):
@@ -114,7 +116,11 @@ class OkerrProject:
     url = None # base url, for director
     project_url = None
     
-    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=None, config=None):
+    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=None, config=None, envconfig=None):
+
+        envconfig = envconfig or '/etc/okerr/okerrupdate'
+        load_dotenv(dotenv_path=envconfig)
+
         self.textid = textid or os.getenv('OKERR_TEXTID')
         self.dry_run = dry_run
         self.secret = secret if secret is not None else os.getenv('OKERR_SECRET')
@@ -132,6 +138,11 @@ class OkerrProject:
         self.make_http()
 
         self.make_logger()
+
+        if self.textid is None or self.secret is None:
+            # try read okerrclient.conf
+            self.read_config(config)
+
 
         if self.textid is None or self.secret is None:
             # try read okerrclient.conf
