@@ -19,6 +19,7 @@ for k, v in os.environ.items():
     lineno = int(os.getenv('{}_LINE'.format(name), '0'))
     grep = os.getenv('{}_GREP'.format(name), '')
     case = int(os.getenv('{}_CASE'.format(name), '1'))
+    stderr = bool(os.getenv('{}_STDERR'.format(name), ''))
 
     cm = os.getenv('{name}_CM'.format(name=name), 'string')
     if cm == 'string':
@@ -39,7 +40,10 @@ for k, v in os.environ.items():
     except Exception as e:
         line = str(e)
     else:
-        lines = r.stdout.decode().strip().split('\n')
+        if stderr:
+            lines = r.stderr.decode().strip().split('\n')
+        else:
+            lines = r.stdout.decode().strip().split('\n')
 
         if grep:
             lines = list(filter(lambda s: re.search(grep, s, grep_opts), lines))

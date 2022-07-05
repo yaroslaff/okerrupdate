@@ -14,6 +14,10 @@ apache_CASE=1
 apache_LINE=0
 apache_CM=string
 
+certs_RUN=/bin/sh -c 'for cert in /etc/letsencrypt/live/*/cert.pem; do /usr/local/bin/showcert -w20 -q $cert; done'
+certs_STDERR=1
+certs_CMARGS=options=static|str=
+
 
 #
 # Other, simpler examples
