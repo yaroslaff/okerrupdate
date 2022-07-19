@@ -3,20 +3,38 @@
 import argparse
 import sys
 import os
+
+import requests
 from okerrupdate import __version__, OkerrProject, get_okerr_conf_dir
 from dotenv import load_dotenv
 
-def api_indicators(p, prefix=None):
+def api_indicators(p, prefix=None):    
     print(p.api_indicators(prefix))
 
 def api_indicator(p, name):
-    print(p.api_indicator(name))
+    try:
+        print(p.api_indicator(name))
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            print("Not found indicator {name!r} in project {textid!r}".format(name=name, textid=p.textid), file=sys.stderr)
+            return 1
+        else:
+            print(e, file=sys.stderr)
+
 
 def api_filter(p, *args):
     print(p.api_filter(*args))
 
 def api_set(p, name, *args):
-    print(p.api_set(name, *args))
+    try:
+        print(p.api_set(name, *args))
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            print("Not found indicator {name!r} in project {textid!r}".format(name=name, textid=p.textid), file=sys.stderr)
+            return 1
+        else:
+            print(e, file=sys.stderr)
+
 
 def get_args():
 

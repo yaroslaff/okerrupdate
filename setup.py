@@ -14,7 +14,7 @@ setup(name='okerrupdate',
       author_email='yaroslaff@gmail.com',
       license='MIT',
       packages=['okerrupdate'],
-      scripts=['scripts/okerrupdate', 'scripts/okerrmod'],
+      scripts=['scripts/okerrupdate', 'scripts/okerrmod', 'scripts/okerrapi'],
       include_package_data=True,
 
       long_description = read('README.md'),
