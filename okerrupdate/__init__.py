@@ -5,7 +5,7 @@ import re
 import time
 import sys
 import os
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 
 # Needed for retries
 from requests.packages.urllib3.util.retry import Retry
@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 
 from dotenv import load_dotenv
 
-__version__ = '1.2.77'
+__version__ = '1.3.0'
 
 
 def get_okerr_conf_dir(default=None):
@@ -116,7 +116,7 @@ class OkerrProject:
     url = None # base url, for director
     project_url = None
     
-    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=None, config=None, envconfig=None):
+    def __init__(self, textid=None, secret=None, url=None, dry_run=False, direct=None, config=None, envconfig=None, apikey=None):
 
         envconfig = envconfig or '/etc/okerr/okerrupdate'
         load_dotenv(dotenv_path=envconfig)
@@ -128,8 +128,8 @@ class OkerrProject:
         self.direct = direct if isinstance(direct, bool) else bool(int(os.getenv('OKERR_DIRECT','0')))
         self.x = dict()
         self.url = url or os.getenv('OKERR_URL', '') or 'https://cp.okerr.com/'
-        
-        
+        self.apikey = apikey
+
         self.timeout = 5
         self.retries = 5
         self.backoff = 2
@@ -373,5 +373,60 @@ class OkerrProject:
             self.project_url = r.text.rstrip()
             self.url_received = time.time()
 
+
         self.log.debug("geturl: return {}".format(self.project_url))
         return self.project_url
+
+    #
+    # API functions
+    #
+
+    def api_get(self, *argv):
+
+        headers = {'X-API-KEY': self.apikey}
+
+        # build url
+        request_url = urljoin(self.geturl(), 'api/')
+        for arg in argv:
+            request_url = urljoin(request_url, quote(arg)+'/')
+
+        # trim last slash
+        if request_url.endswith('/'):
+            request_url = request_url[:-1]
+
+        r = requests.get(request_url, headers=headers)
+        r.raise_for_status()
+        return r.text
+
+    def api_post(self, pathlist, data):
+
+        headers = {'X-API-KEY': self.apikey}
+
+        # build url
+        request_url = urljoin(self.geturl(), 'api/')
+        for arg in pathlist:
+            request_url = urljoin(request_url, quote(arg)+'/')
+
+        # trim last slash
+        if request_url.endswith('/'):
+            request_url = request_url[:-1]
+
+        r = requests.post(request_url, headers=headers, data=data)
+        r.raise_for_status()
+        return r.text
+
+
+    def api_indicators(self, prefix):
+        if prefix:
+            return self.api_get('indicators', self.textid, prefix)
+        else:
+            return self.api_get('indicators', self.textid)
+    
+    def api_indicator(self, name):
+        return self.api_get('indicator', self.textid, name)
+    
+    def api_filter(self, *args):
+        return self.api_get('filter', self.textid, *args)
+    
+    def api_set(self, name, data):
+        return self.api_post(["set", self.textid, name], data)
