@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 
 from dotenv import load_dotenv
 
-__version__ = '1.3.1'
+__version__ = '1.3.2'
 
 
 def get_okerr_conf_dir(default=None):
@@ -373,8 +373,6 @@ class OkerrProject:
             self.project_url = r.text.rstrip()
             self.url_received = time.time()
 
-
-        self.log.debug("geturl: return {}".format(self.project_url))
         return self.project_url
 
     #
@@ -394,6 +392,7 @@ class OkerrProject:
         if request_url.endswith('/'):
             request_url = request_url[:-1]
 
+        self.log.debug('GET request to {}'.format(request_url))
         r = requests.get(request_url, headers=headers)
         r.raise_for_status()
         return r.text
@@ -411,6 +410,7 @@ class OkerrProject:
         if request_url.endswith('/'):
             request_url = request_url[:-1]
 
+        self.log.debug('Make POST request to {}'.format(request_url))
         r = requests.post(request_url, headers=headers, data=data)
         r.raise_for_status()
         return r.text

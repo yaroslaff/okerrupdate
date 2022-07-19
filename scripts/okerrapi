@@ -77,12 +77,14 @@ def get_args():
     parser.add_argument('--url', metavar='URL', help='URL of server (usually not needed)', default=None)
     parser.add_argument('--direct', action='store_true', help='Do not use director feature, use direct --url',
                         default=None)
+    parser.add_argument('-v', '--verbose', action='store_true', default=False, help='Verbose mode')
     return parser.parse_args()
 
 def main():
     args = get_args()
     p = OkerrProject(args.textid, url=args.url, direct=args.direct, apikey = args.key)
-
+    if args.verbose:
+        p.verbose()
 
     # sanity check
     if args.cmd in ['indicator', 'set'] and not args.name:
