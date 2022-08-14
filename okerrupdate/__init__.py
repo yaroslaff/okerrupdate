@@ -13,7 +13,7 @@ from requests.adapters import HTTPAdapter
 
 from dotenv import load_dotenv
 
-__version__ = '1.3.2'
+__version__ = '1.3.3'
 
 
 def get_okerr_conf_dir(default=None):
