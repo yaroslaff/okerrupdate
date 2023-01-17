@@ -2,8 +2,9 @@
 # Traffic
 #
 
-# interfaces to report traffic
-INTERFACES=defgw enp9s0
+# interfaces list to report traffic
+# INTERFACES=defgw wg0 eth0
+INTERFACES=defgw
 
 # Policy if not default
 POLICY=
