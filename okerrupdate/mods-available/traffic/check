@@ -39,7 +39,7 @@ for iface_spec in filter(None, interfaces.split(' ')):
     txrx = get_interface_tx_rx(iface)
 
     for direction, amount in zip(['tx', 'rx'], txrx):
-        print("NAME: {}{}-{}".format(prefix, iface, direction))
+        print("NAME: {}{}-{}".format(prefix, iface_spec, direction))
         print("TAGS: traffic")
         print("DETAILS: {}".format(kmgt(amount)))
         print("METHOD: numerical|minlim=0")
