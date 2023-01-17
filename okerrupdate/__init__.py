@@ -13,8 +13,7 @@ from requests.adapters import HTTPAdapter
 
 from dotenv import load_dotenv
 
-__version__ = '1.3.4'
-
+from .version import __version__
 
 def get_okerr_conf_dir(default=None):
     cflist = [

@@ -166,7 +166,8 @@ class Module:
         env = dict()
         envfile = os.path.join(self.path_env, self._name)
         if not os.path.isfile(envfile):
-            log.debug('no envfile {}, using empty env'.format(envfile))
+            log.debug('no envfile {} for mod {!r}, using system env'.format(envfile, self._name))
+            env = dict(os.environ)
             return env
 
         log.debug("load env for {} from {}".format(self._name, envfile))

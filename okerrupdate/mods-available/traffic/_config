@@ -1,0 +1,9 @@
+#
+# Traffic
+#
+
+# interfaces to report traffic
+INTERFACES=defgw enp9s0
+
+# Policy if not default
+POLICY=
