@@ -3,6 +3,7 @@ from okerrupdate import OkerrProject, OkerrExc, __version__
 from dotenv import load_dotenv
 import argparse
 import os
+import sys
 
 import okerrupdate
 
@@ -43,5 +44,9 @@ if args.verbose:
 try:
     i = p.indicator(name, secret=args.secret, method=args.method, desc=args.desc, policy=args.policy)
     i.update(args.value, details=args.details)
+
 except OkerrExc as e:
-    print(e)
+    print(e, file=sys.stderr)
+    print("Documentation: https://okerrupdate.readthedocs.io/en/latest/")
+    print("Configuration: https://okerrupdate.readthedocs.io/en/latest/configuration.html")
+    sys.exit(1)    

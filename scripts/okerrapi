@@ -5,7 +5,7 @@ import sys
 import os
 
 import requests
-from okerrupdate import __version__, OkerrProject, get_okerr_conf_dir
+from okerrupdate import __version__, OkerrProject, OkerrExc, get_okerr_conf_dir
 from dotenv import load_dotenv
 
 def api_indicators(p, prefix=None):    
@@ -115,4 +115,10 @@ def main():
         api_set(p, args.name, d)
 
 if __name__ == '__main__':
-    sys.exit(main())
+    try:
+        sys.exit(main())
+    except OkerrExc as e:
+        print(e, file=sys.stderr)
+        print("Documentation: https://okerrupdate.readthedocs.io/en/latest/")
+        print("Configuration: https://okerrupdate.readthedocs.io/en/latest/configuration.html")
+        sys.exit(1)

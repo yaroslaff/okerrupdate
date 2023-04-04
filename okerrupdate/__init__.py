@@ -17,10 +17,10 @@ from .version import __version__
 
 def get_okerr_conf_dir(default=None):
     cflist = [
-        '/usr/local/etc/okerr/',
-        '/etc/okerr/',
         os.path.expanduser('~/okerr'),
-        os.path.expanduser('~/.okerr')
+        os.path.expanduser('~/.okerr'),
+        '/usr/local/etc/okerr/',
+        '/etc/okerr/'
     ]
     for path in cflist:
         conffile = os.path.join(path, 'okerrupdate')
@@ -29,7 +29,6 @@ def get_okerr_conf_dir(default=None):
     if default:
         return default
     raise OkerrExc(msg='Misconfigured? Not found file "okerrupdate" in {cflist}'.format(cflist=cflist))
-
 
 class OkerrExc(Exception):
     def __init__(self, msg, code=None, requests_response=None, requests_exception=None):
@@ -138,14 +137,11 @@ class OkerrProject:
 
         self.make_logger()
 
-        if self.textid is None or self.secret is None:
-            # try read okerrclient.conf
-            self.read_config(config)
+        if self.textid is None:
+            raise OkerrExc('No OKERR_TEXTID')
 
-
-        if self.textid is None or self.secret is None:
-            # try read okerrclient.conf
-            self.read_config(config)
+        if self.secret is None:
+            raise OkerrExc('No OKERR_SECRET')
 
     def make_http(self):
         retry_strategy = Retry(
@@ -380,6 +376,9 @@ class OkerrProject:
 
     def api_get(self, *argv):
 
+        if self.apikey is None:
+            raise OkerrExc('No OKERR_API_KEY')
+
         headers = {'X-API-KEY': self.apikey}
 
         # build url
@@ -397,6 +396,9 @@ class OkerrProject:
         return r.text
 
     def api_post(self, pathlist, data):
+
+        if self.apikey is None:
+            raise OkerrExc('No OKERR_API_KEY')
 
         headers = {'X-API-KEY': self.apikey}
 

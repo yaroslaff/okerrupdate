@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import okerrupdate
+from okerrupdate import OkerrExc
 import argparse
 import socket
 import subprocess
@@ -521,4 +522,10 @@ OKERR_MOD_AVAIL=
         m = Module(mod_path=mod_path)
         m.check(prefix=args.prefix, project=p, secret=args.secret, dump=args.dump)
 
-main()
+try:
+    main()
+except OkerrExc as e:
+    print(e, file=sys.stderr)
+    print("Documentation: https://okerrupdate.readthedocs.io/en/latest/")
+    print("Configuration: https://okerrupdate.readthedocs.io/en/latest/configuration.html")
+    sys.exit(1)
