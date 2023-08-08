@@ -3,7 +3,13 @@
 ## Installation 
 
 ```shell
+# newer method with pipx
+sudo pipx install okerrupdate
+
+# old method with pip3, if you cannot install pipx
 sudo pip3 install okerrupdate
+
+
 sudo okerrmod --init # enable few basic modules, create /etc/cron.d/ job, create okerrupdate config template
 sudo vim /etc/okerr/okerrupdate
 ```
