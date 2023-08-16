@@ -2,6 +2,9 @@
 
 import sys, os, requests, time
 
+# disable  IPv6
+requests.packages.urllib3.util.connection.HAS_IPV6 = False
+
 url = os.getenv('URL', 'https://ifconfig.me/ip')
 user_agent = os.getenv('USER_AGENT', 'curl/7.58.0')
 
