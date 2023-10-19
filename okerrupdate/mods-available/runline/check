@@ -20,6 +20,7 @@ for k, v in os.environ.items():
     grep = os.getenv('{}_GREP'.format(name), '')
     case = int(os.getenv('{}_CASE'.format(name), '1'))
     stderr = bool(os.getenv('{}_STDERR'.format(name), ''))
+    join = os.getenv('{}_JOIN'.format(name))
 
     cm = os.getenv('{name}_CM'.format(name=name), 'string')
     if cm == 'string':
@@ -45,12 +46,17 @@ for k, v in os.environ.items():
         else:
             lines = r.stdout.decode().strip().split('\n')
 
+
         if grep:
             lines = list(filter(lambda s: re.search(grep, s, grep_opts), lines))
-        try:
-            line = lines[lineno]
-        except IndexError:
-            line = ''
+
+        if join is not None:
+            line = join.join(lines)
+        else:
+            try:
+                line = lines[lineno]
+            except IndexError:
+                line = ''
 
     print('NAME: {prefix}{name}'.format(prefix=prefix, name=name))
     print('TAGS: run')
