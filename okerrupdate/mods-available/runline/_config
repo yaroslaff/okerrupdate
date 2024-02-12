@@ -30,6 +30,7 @@ apache_CM=string
 
 ### service: used memory in megabytes
 # mariadb_mem_RUN=/bin/sh -c 'systemctl status mariadb | grep Memory| tr -cd "[:digit:]."'
+# mariadb_mem_RUN=/bin/sh -c 'systemctl show --property=MemoryCurrent --value mysql | awk "{printf \"%.0f\n\", \$1/1024/124}"'
 # mariadb_mem_CM=numerical
 # mariadb_mem_CMARGS=
 
