@@ -5,4 +5,6 @@ dist/
 build/
 .idea
 .vscode.code-workspace
+.venv
+
 

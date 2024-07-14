@@ -148,7 +148,8 @@ class OkerrProject:
             total=self.retries,
             backoff_factor=self.backoff,
             status_forcelist=[429, 500, 502, 503, 504],
-            method_whitelist=["HEAD", "GET", "POST", "OPTIONS"]
+            allowed_methods=["HEAD", "GET", "POST", "OPTIONS"]
+            # method_whitelist=["HEAD", "GET", "POST", "OPTIONS"]
         )
         adapter = HTTPAdapter(max_retries=retry_strategy)
         self.http = requests.Session()

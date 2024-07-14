@@ -1,0 +1,44 @@
+[build-system]
+# requires = ["setuptools >= 40.6.0", "wheel"]
+requires = ["hatchling", "wheel"]
+
+# build-backend = "setuptools.build_meta"
+build-backend = "hatchling.build"
+
+[project]
+name="okerrupdate"
+dynamic = [ "version" ]
+
+# how version managed by hatch
+# version="0.1.17"
+
+dependencies = [
+    'requests',
+    'urllib3',
+    'psutil',
+    'python-dotenv'
+]
+authors = [
+  { name="Yaroslav Polyakov", email="yaroslaff@gmail.com" },
+]
+description = "okerr monitoring: client-side module and utilities"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/yaroslaff/okerrupdate"
+Issues = "https://github.com/yaroslaff/okerrupdate/issues"
+
+
+[project.scripts]
+okerrupdate = "okerrupdate.scripts.okerrupdate:main"
+okerrmod = "okerrupdate.scripts.okerrmod:main"
+okerrapi = "okerrupdate.scripts.okerrapi:main"
+
+[tool.hatch.version]
+path = 'okerrupdate/version.py'

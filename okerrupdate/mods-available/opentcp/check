@@ -31,7 +31,7 @@ ports = list()
 
 for p in psutil.process_iter():
     try:
-        conns = p.connections()
+        conns = p.net_connections()
         if len(conns):
 
             for c in conns:
