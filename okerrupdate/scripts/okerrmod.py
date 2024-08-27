@@ -316,7 +316,6 @@ def read_template(path:str , tokens: dict):
 
 
 def main():
-
     global log
     global def_mods_available
 
@@ -523,10 +522,12 @@ OKERR_MOD_AVAIL=
         m = Module(mod_path=mod_path)
         m.check(prefix=args.prefix, project=p, secret=args.secret, dump=args.dump)
 
-try:
-    main()
-except OkerrExc as e:
-    print(e, file=sys.stderr)
-    print("Documentation: https://okerrupdate.readthedocs.io/en/latest/")
-    print("Configuration: https://okerrupdate.readthedocs.io/en/latest/configuration.html")
-    sys.exit(1)
+
+if __name__ == '__main__':
+    try:
+            main()
+    except OkerrExc as e:
+        print(e, file=sys.stderr)
+        print("Documentation: https://okerrupdate.readthedocs.io/en/latest/")
+        print("Configuration: https://okerrupdate.readthedocs.io/en/latest/configuration.html")
+        sys.exit(1)
