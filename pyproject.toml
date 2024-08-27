@@ -13,10 +13,10 @@ dynamic = [ "version" ]
 # version="0.1.17"
 
 dependencies = [
-    'requests',
-    'urllib3',
-    'psutil',
-    'python-dotenv'
+    'requests >= 2.32.3',
+    'urllib3 >= 2.2.2',
+    'psutil >= 6.0.0',
+    'python-dotenv >= 1.0.1'
 ]
 authors = [
   { name="Yaroslav Polyakov", email="yaroslaff@gmail.com" },
