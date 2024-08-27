@@ -307,10 +307,10 @@ def uniq(iterable):
         last = e
         yield e
 
-def read_template(path, tokens):
+def read_template(path:str , tokens: dict):
     with open(path, "r") as srcf:
         data = srcf.read()
-        for token, value in tokens:
+        for token, value in tokens.items():
             data = data.replace(token, value)
         return data
 
@@ -485,9 +485,10 @@ OKERR_MOD_AVAIL=
         if os.path.exists('/etc/cron.d/'):
             offset = random.randrange(20)
             tokens = {
-                ('%PYTHON%', sys.executable),
-                ('%OKERRMOD%', os.path.realpath(__file__)),
-                ('%MINUTES%', ','.join(map(str, [offset, offset+20, offset+40])))
+                '%ARGV0%': sys.argv[0],
+                '%PYTHON%': sys.executable,
+                '%OKERRMOD%': os.path.realpath(__file__),
+                '%MINUTES%': ','.join(map(str, [offset, offset+20, offset+40]))
             }
 
             crondata = read_template(os.path.join(os.path.dirname(okerrupdate.__file__), 'contrib', 'okerrmod'), tokens)
