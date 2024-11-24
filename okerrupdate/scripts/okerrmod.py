@@ -321,6 +321,7 @@ def main():
 
     # main code
     conf_file = os.path.join(okerr_conf_dir, 'okerrupdate')
+
     load_dotenv(dotenv_path=conf_file)
 
     def_prefix = os.getenv('PREFIX', socket.gethostname().split('.')[0]+':')
@@ -365,8 +366,12 @@ def main():
         print(okerrupdate.__version__)
         return
 
+    if args.verbose:
+        print("Using config file", conf_file)
+
     if args.avail:
         def_mods_available = [args.avail] + def_mods_available
+
 
     logging.basicConfig()
     log = logging.getLogger('okerrmod')
@@ -515,7 +520,12 @@ OKERR_MOD_AVAIL=
         p.verbose()
 
     for mod_spec in args.modlist:
-        mod_path = Module.find_module(mod_spec)
+        try:
+            mod_path = Module.find_module(mod_spec)
+        except NotConfigured as e:
+            print(e, file=sys.stderr)
+            continue
+
         if mod_path is None:
             log.error('No module: {}'.format(mod_spec))
             continue

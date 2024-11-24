@@ -49,25 +49,36 @@ minlim = os.getenv('MINLIM','10k')
 diffmin = os.getenv('DIFFMIN','0')
 skip = os.getenv('SKIP','')
 
+
+# prepare filelist (only most recent file per each template)
+files = dict()
+
 for path in pathlist.split(' '):
     for curpath in glob.glob(path):
-
-        if skip and re.search(skip, curpath):
-            continue
-
-        if time.time() - os.stat(curpath).st_mtime < completed:
-            continue
-
-        if time.time() - os.stat(curpath).st_mtime > fresh:
-            continue
-
         tpl = re.sub(date, datesub, os.path.basename(curpath))
-        sz = os.stat(curpath).st_size
+        if tpl not in files:
+            files[tpl] = curpath
+        else:
+            if os.stat(curpath).st_mtime > os.stat(files[tpl]).st_mtime:
+                files[tpl] = curpath
 
-        print("NAME: {}{}".format(prefix, tpl))
-        print("TAGS: backups")
-        print("DETAILS: {}: {}".format(os.path.basename(curpath), kmgt(sz)))
-        print("METHOD: numerical|minlim={}|diffmin={}".format(minlim, diffmin))
-        print("STATUS: {}".format(sz))
-        print()
+for curpath in files.values():
+    if skip and re.search(skip, curpath):
+        continue
+
+    if time.time() - os.stat(curpath).st_mtime < completed:
+        continue
+
+    if time.time() - os.stat(curpath).st_mtime > fresh:
+        continue
+
+    tpl = re.sub(date, datesub, os.path.basename(curpath))
+    sz = os.stat(curpath).st_size
+
+    print("NAME: {}{}".format(prefix, tpl))
+    print("TAGS: backups")
+    print("DETAILS: {}: {}".format(os.path.basename(curpath), kmgt(sz)))
+    print("METHOD: numerical|minlim={}|diffmin={}".format(minlim, diffmin))
+    print("STATUS: {}".format(sz))
+    print()
 
