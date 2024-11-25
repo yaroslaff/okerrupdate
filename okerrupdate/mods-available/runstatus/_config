@@ -3,6 +3,29 @@
 #
 
 #
+# x_OK will make a heartbeat indicator prefix:x with OK/ERR status based on exit code
+# x_RUN will make a numerical indicator prefix:x with numerical status minlim=0, maxlim=0
+
+# OPTIONS:
+# x_CHDIR will run command in directory x_CHDIR
+# x_USER and x_GROUP will run command as user x_USER and group x_GROUP
+
+#
+# This will make heartbeat indicator prefix:apache with status OK (always OK unless failed)
+#
+apache_RUN="systemctl is-active --quiet apache2"
+
+#
+# This will make heartbeat indicator prefix:apache with status OK (always OK unless failed)
+#
+apache_OK="systemctl is-active --quiet apache2"
+
+#
+#
+
+
+
+#
 # This will make heartbeat indicator prefix:true with status OK (always OK unless failed)
 #
 # true_OK=/bin/true

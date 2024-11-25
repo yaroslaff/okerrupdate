@@ -17,8 +17,16 @@ for varsuffix in VARSUFFIX_LIST:
         name = k[:-len(varsuffix)]
         details = ''
 
+
         try:
-            r = subprocess.run(shlex.split(v), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            r = subprocess.run(
+                shlex.split(v), 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.PIPE,
+                user=os.getenv(name + '_USER'),
+                group=os.getenv(name + '_GROUP'),
+                cwd=os.getenv(name + '_CHDIR')
+                )
         except Exception as e:
             code = -1
             details = str(e)
