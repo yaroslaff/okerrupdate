@@ -12,9 +12,9 @@ user_agent = os.getenv('USER_AGENT', 'curl/7.58.0')
 def myip():
     headers = { 'User-Agent': user_agent}
 
-    while True:
+    for attempt in range(5):
         try:
-            print(f"# GET {url}")
+            print(f"# attempt {attempt}: GET {url}")
             r = requests.get(url, headers=headers, timeout=5)
         except requests.exceptions.RequestException:
             time.sleep(1)
