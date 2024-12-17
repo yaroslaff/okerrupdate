@@ -1,9 +1,14 @@
 # default URL
-URL=https://ifconfig.me/ip
+URL=https://checkip.amazonaws.com
 
 # Alternate URLS
-# URL=https://ifconfig.me
-# URL=https://ifconfig.me
+# URL=https://ifconfig.me/ip
+# URL=https://api.ipify.org
+# URL=https://icanhazip.com
+# URL=https://ipinfo.io/ip
+# URL=https://wtfismyip.com
+# URL=https://ifconfig.co
+# URL=https://ipapi.co/ip
 
 USER_AGENT=curl/7.58.0
 

@@ -14,7 +14,8 @@ def myip():
 
     while True:
         try:
-            r = requests.get(url, headers=headers)
+            print(f"# GET {url}")
+            r = requests.get(url, headers=headers, timeout=5)
         except requests.exceptions.RequestException:
             time.sleep(1)
             pass
