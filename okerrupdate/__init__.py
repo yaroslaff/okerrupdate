@@ -125,7 +125,7 @@ class OkerrProject:
         self.url_expiration = 300
         self.direct = direct if isinstance(direct, bool) else bool(int(os.getenv('OKERR_DIRECT','0')))
         self.x = dict()
-        self.url = url or os.getenv('OKERR_URL', '') or 'https://cp.okerr.com/'
+        self.url = url or os.getenv('OKERR_URL', '') or 'https://my.okerr.com/'
         self.apikey = apikey
 
         self.timeout = 5
