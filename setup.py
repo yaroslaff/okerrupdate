@@ -20,7 +20,7 @@ setup(name='okerrupdate',
       long_description = read('README.md'),
       long_description_content_type='text/markdown',
 
-      install_requires=['requests == 2.32.4', 'urllib3 == 2.5.0', 'psutil', 'python-dotenv'],
+      install_requires=['requests == 2.32.4', 'urllib3 == 2.6.0', 'psutil', 'python-dotenv'],
       zip_safe=False
       )
 
