@@ -14,7 +14,7 @@ dynamic = [ "version" ]
 
 dependencies = [
     'requests >= 2.32.3',
-    'urllib3 >= 2.5.0',
+    'urllib3 >= 2.6.0',
     'psutil >= 6.0.0',
     'python-dotenv >= 1.0.1'
 ]
