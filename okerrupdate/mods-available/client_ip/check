@@ -17,12 +17,14 @@ def myip():
             print(f"# attempt {attempt}: GET {url}")
             r = requests.get(url, headers=headers, timeout=5)
         except requests.exceptions.RequestException:
-            time.sleep(1)
-            pass
-        if r.status_code == 200:
-            return r.text.strip()
-        else:
             time.sleep(5)
+            pass
+        else:
+            if r.status_code == 200:
+                return r.text.strip()
+            else:
+                time.sleep(5)
+
 
 
 ip = myip()
