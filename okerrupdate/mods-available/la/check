@@ -21,7 +21,7 @@ elif period == 5:
 else:
     la = load15
 
-print("NAME: {}{}".format(prefix, basename))
-print("TAGS: la")
-print("METHOD: numerical|maxlim={}".format(maxlim))
-print("STATUS: {}".format(la))
+print(f"NAME: {prefix}{basename}")
+print(f"TAGS: la")
+print(f"METHOD: numerical|maxlim={maxlim}")
+print(f"STATUS: {la:.3}")

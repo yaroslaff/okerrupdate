@@ -9,22 +9,22 @@ maxlim = int(os.getenv('MAXLIM','2'))
 
 load1, load5, load15 = os.getloadavg()
 
-data = """
+data = f"""
 NAME: {prefix}la1
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load1}
+STATUS: {load1:.3}
 
 NAME: {prefix}la5
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load5}
+STATUS: {load5:.3}
 
 NAME: {prefix}la15
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load15}
+STATUS: {load15:.3}
 
-""".format(prefix=prefix, load1=load1, load5=load5, load15=load15, maxlim=maxlim).strip()
+""".strip()
 
 print(data)
