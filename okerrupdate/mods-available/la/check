@@ -24,4 +24,4 @@ else:
 print(f"NAME: {prefix}{basename}")
 print(f"TAGS: la")
 print(f"METHOD: numerical|maxlim={maxlim}")
-print(f"STATUS: {la:.3}")
+print(f"STATUS: {la:.3f}")

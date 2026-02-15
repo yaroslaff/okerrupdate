@@ -13,17 +13,17 @@ data = f"""
 NAME: {prefix}la1
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load1:.3}
+STATUS: {load1:.3f}
 
 NAME: {prefix}la5
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load5:.3}
+STATUS: {load5:.3f}
 
 NAME: {prefix}la15
 TAGS: la
 METHOD: numerical|maxlim={maxlim}
-STATUS: {load15:.3}
+STATUS: {load15:.3f}
 
 """.strip()
 
