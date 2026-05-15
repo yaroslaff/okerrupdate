@@ -13,8 +13,8 @@ dynamic = [ "version" ]
 # version="0.1.17"
 
 dependencies = [
-    'requests >= 2.32.3',
-    'urllib3 >= 2.6.0',
+    'requests >= 2.33.0',
+    'urllib3 >= 2.7.0',
     'psutil >= 6.0.0',
     'python-dotenv >= 1.0.1'
 ]
